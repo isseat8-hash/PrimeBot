@@ -34,6 +34,8 @@ const client = new Client({
 
 const CONFIG = {
 
+    PREFIX:"!",
+
     ONERI_KANAL:
     "1534594853751492832",
 
@@ -52,28 +54,49 @@ const CONFIG = {
     TICKET_CATEGORY:
     "1534594837884698814",
 
+    LOG_CHANNEL:
+    "",
+
     MC_IP:
     "Yakında"
 
 };
 
 
+
 // =====================
 // STORAGE
 // =====================
 
-const activeTickets = new Map();
+const activeTickets =
+new Map();
 
-const warns = new Collection();
 
-const inviteCache = new Collection();
+const warns =
+new Collection();
+
+
+const inviteCache =
+new Collection();
+
+
+const inviteStats =
+new Collection();
+
+
+const giveaways =
+new Map();
+
 
 
 // =====================
 // READY
 // =====================
 
-client.once("ready", async()=>{
+client.once(
+"ready",
+async()=>{
+
 
     console.log(
         `✅ ${client.user.tag} aktif`
@@ -88,7 +111,10 @@ client.once("ready", async()=>{
     );
 
 
-    for(const guild of client.guilds.cache.values()){
+
+    for(
+        const guild of client.guilds.cache.values()
+    ){
 
         try{
 
@@ -97,29 +123,36 @@ client.once("ready", async()=>{
 
 
             inviteCache.set(
+
                 guild.id,
+
                 new Collection(
+
                     invites.map(
                         x=>[
                             x.code,
                             x.uses
                         ]
                     )
+
                 )
+
             );
 
 
         }catch(err){
 
             console.log(
-                "Invite alınamadı"
+                "Invite cache alınamadı"
             );
 
         }
 
     }
 
+
 });
+
 
 
 // =====================
@@ -130,7 +163,9 @@ client.on(
 "guildMemberAdd",
 async(member)=>{
 
+
     try{
+
 
         const role =
         member.guild.roles.cache.get(
@@ -148,652 +183,890 @@ async(member)=>{
     }catch(err){
 
         console.log(
-            "Otorol hatası:",
+            "Otorol hata:",
             err.message
         );
 
     }
+
 
 });
 client.on(
 "messageCreate",
 async(message)=>{
 
-    if(
-        message.author.bot ||
-        !message.guild
-    ) return;
 
-
-    const args =
-    message.content
-    .trim()
-    .split(/ +/);
-
-
-    const command =
-    args.shift()
-    .toLowerCase();
+if(
+message.author.bot ||
+!message.guild
+) return;
 
 
 
-    // =====================
-    // PING
-    // =====================
-
-    if(command === "!ping"){
-
-        return message.reply(
-            `🏓 Pong! ${client.ws.ping}ms`
-        );
-
-    }
+const args =
+message.content
+.trim()
+.split(/ +);
 
 
 
-    // =====================
-    // IP
-    // =====================
+const command =
+args.shift()
+.toLowerCase();
 
-    if(command === "!ip"){
 
-        const embed =
-        new EmbedBuilder()
 
-        .setTitle(
-            "⚔️ AEGISNW Network"
-        )
+// =====================
+// PING
+// =====================
 
-        .setDescription(`
+if(command === "!ping"){
+
+return message.reply(
+`🏓 Pong! ${client.ws.ping}ms`
+);
+
+}
+
+
+
+// =====================
+// IP
+// =====================
+
+if(command === "!ip"){
+
+
+const embed =
+new EmbedBuilder()
+
+.setTitle(
+"⚔️ AEGISNW Network"
+)
+
+.setDescription(`
+
 ☕ **Java Sunucusu**
 
 📡 IP:
 \`Yakında\`
+
 
 📱 **Bedrock Sunucusu**
 
 📡 IP:
 \`Yakında\`
 
+
 🔌 Port:
+
 \`Yakında\`
-        `)
 
-        .setColor("#5865F2");
+`)
 
-
-        return message.channel.send({
-            embeds:[embed]
-        });
-
-    }
+.setColor("#5865F2")
+.setTimestamp();
 
 
 
+return message.channel.send({
+
+embeds:[embed]
+
+});
+
+}
+
+
+
+// =====================
+// AVATAR
+// =====================
+
+if(command === "!avatar"){
+
+
+const user =
+message.mentions.users.first()
+||
+message.author;
+
+
+
+return message.channel.send({
+
+embeds:[
+
+new EmbedBuilder()
+
+.setTitle(
+`${user.username} Avatar`
+)
+
+.setImage(
+user.displayAvatarURL({
+size:1024
+})
+)
+
+.setColor("#5865F2")
+
+]
+
+});
+
+}
+
+
+
+// =====================
+// SERVER INFO
+// =====================
+
+if(command === "!serverinfo"){
+
+
+const embed =
+new EmbedBuilder()
+
+.setTitle(
+"🌐 AEGISNW Sunucu Bilgileri"
+)
+
+.addFields(
+
+{
+name:"👑 Kurucu",
+value:`<@${CONFIG.OWNER}>`,
+inline:true
+},
+
+{
+name:"👥 Üye",
+value:`${message.guild.memberCount}`,
+inline:true
+},
+
+{
+name:"🟢 Aktif",
+value:`${message.guild.presences.cache.size}`,
+inline:true
+}
+
+)
+
+.setColor("#5865F2");
+
+
+
+return message.channel.send({
+
+embeds:[embed]
+
+});
+
+
+}
+
+
+
+// =====================
+// USER INFO
+// =====================
+
+if(command === "!userinfo"){
+
+
+const member =
+message.mentions.members.first()
+||
+message.member;
+
+
+
+const embed =
+new EmbedBuilder()
+
+.setTitle(
+`👤 ${member.user.username}`
+)
+
+.setThumbnail(
+member.user.displayAvatarURL()
+)
+
+.addFields(
+
+{
+name:"🆔 ID",
+value:member.id
+},
+
+{
+name:"📅 Katılma",
+value:
+`<t:${Math.floor(member.joinedTimestamp/1000)}:R>`
+}
+
+)
+
+.setColor("#5865F2");
+
+
+
+return message.channel.send({
+
+embeds:[embed]
+
+});
+
+}
     // =====================
-    // AVATAR
-    // =====================
+// CLEAR
+// =====================
 
-    if(command === "!avatar"){
+if(command === "!clear"){
 
-        const user =
-        message.mentions.users.first()
-        ||
-        message.author;
+if(
+!message.member.permissions.has(
+PermissionFlagsBits.ManageMessages
+)
+)
+return;
 
 
-        return message.channel.send({
+const amount =
+Number(args[0]);
 
-            embeds:[
 
-                new EmbedBuilder()
+if(!amount)
+return message.reply(
+"❌ Sayı gir."
+);
 
-                .setTitle(
-                    `${user.username} Avatar`
-                )
 
-                .setImage(
-                    user.displayAvatarURL({
-                        size:1024
-                    })
-                )
+await message.channel.bulkDelete(
+amount,
+true
+);
 
-                .setColor("#5865F2")
 
-            ]
+return message.reply(
+`🗑️ ${amount} mesaj silindi.`
+);
 
-        });
+}
 
-    }
 
 
+// =====================
+// LOCK
+// =====================
 
-    // =====================
-    // CLEAR
-    // =====================
+if(command === "!lock"){
 
-    if(command === "!clear"){
+if(
+!message.member.permissions.has(
+PermissionFlagsBits.Administrator
+)
+)
+return;
 
-        if(
-            !message.member.permissions.has(
-                PermissionFlagsBits.ManageMessages
-            )
-        ) return;
 
+await message.channel.permissionOverwrites.edit(
 
-        const amount =
-        Number(args[0]);
+message.guild.roles.everyone,
 
+{
+SendMessages:false
+}
 
-        if(!amount)
-        return message.reply(
-            "❌ Sayı gir."
-        );
+);
 
 
-        await message.channel.bulkDelete(
-            amount,
-            true
-        );
+return message.reply(
+"🔒 Kanal kilitlendi."
+);
 
+}
 
-        return message.reply(
-            `🗑️ ${amount} mesaj silindi.`
-        );
 
-    }
 
+// =====================
+// UNLOCK
+// =====================
 
+if(command === "!unlock"){
 
-    // =====================
-    // LOCK
-    // =====================
+if(
+!message.member.permissions.has(
+PermissionFlagsBits.Administrator
+)
+)
+return;
 
-    if(command === "!lock"){
 
-        if(
-            !message.member.permissions.has(
-                PermissionFlagsBits.Administrator
-            )
-        ) return;
+await message.channel.permissionOverwrites.edit(
 
+message.guild.roles.everyone,
 
-        await message.channel.permissionOverwrites.edit(
+{
+SendMessages:true
+}
 
-            message.guild.roles.everyone,
+);
 
-            {
-                SendMessages:false
-            }
 
-        );
+return message.reply(
+"🔓 Kanal açıldı."
+);
 
+}
 
-        return message.reply(
-            "🔒 Kanal kilitlendi."
-        );
 
-    }
 
+// =====================
+// BAN
+// =====================
 
+if(command === "!ban"){
 
-    // =====================
-    // UNLOCK
-    // =====================
+if(
+!message.member.permissions.has(
+PermissionFlagsBits.BanMembers
+)
+)
+return;
 
-    if(command === "!unlock"){
 
-        if(
-            !message.member.permissions.has(
-                PermissionFlagsBits.Administrator
-            )
-        ) return;
+const member =
+message.mentions.members.first();
 
 
-        await message.channel.permissionOverwrites.edit(
+if(!member)
+return message.reply(
+"Üye etiketle."
+);
 
-            message.guild.roles.everyone,
 
-            {
-                SendMessages:true
-            }
+await member.ban();
 
-        );
 
+return message.reply(
+"🔨 Üye banlandı."
+);
 
-        return message.reply(
-            "🔓 Kanal açıldı."
-        );
+}
 
-    }
 
 
+// =====================
+// KICK
+// =====================
 
-    // =====================
-    // BAN
-    // =====================
+if(command === "!kick"){
 
-    if(command === "!ban"){
+if(
+!message.member.permissions.has(
+PermissionFlagsBits.KickMembers
+)
+)
+return;
 
-        if(
-            !message.member.permissions.has(
-                PermissionFlagsBits.BanMembers
-            )
-        ) return;
 
+const member =
+message.mentions.members.first();
 
-        const member =
-        message.mentions.members.first();
 
+if(!member)
+return message.reply(
+"Üye etiketle."
+);
 
-        if(!member)
-        return;
 
+await member.kick();
 
-        await member.ban();
 
+return message.reply(
+"👢 Üye atıldı."
+);
 
-        return message.reply(
-            "🔨 Üye banlandı."
-        );
+}
 
-    }
 
 
+// =====================
+// WARN
+// =====================
 
-    // =====================
-    // KICK
-    // =====================
+if(command === "!warn"){
 
-    if(command === "!kick"){
+const member =
+message.mentions.members.first();
 
-        if(
-            !message.member.permissions.has(
-                PermissionFlagsBits.KickMembers
-            )
-        ) return;
 
+if(!member)
+return;
 
-        const member =
-        message.mentions.members.first();
 
+if(!warns.has(member.id))
+warns.set(member.id,0);
 
-        if(!member)
-        return;
 
+warns.set(
+member.id,
+warns.get(member.id)+1
+);
 
-        await member.kick();
 
+return message.reply(
+`⚠️ ${member} uyarıldı.
+Toplam warn: ${warns.get(member.id)}`
+);
 
-        return message.reply(
-            "👢 Üye atıldı."
-        );
+}
 
-    }
-        // =====================
-    // TICKET PANEL
-    // =====================
+// =====================
+// 🛠 BUTONLU ADMIN PANEL
+// =====================
 
-    if(command === "!ticket" || command === "!ticketpanel"){
+if(command === "!panel"){
 
 
-        if(
-            !message.member.permissions.has(
-                PermissionFlagsBits.Administrator
-            )
-        )
-        return message.reply(
-            "❌ Yetkin yok."
-        );
+if(
+!message.member.permissions.has(
+PermissionFlagsBits.Administrator
+)
+)
+return message.reply(
+"❌ Bu panel sadece Administrator."
+);
 
 
-        const embed =
-        new EmbedBuilder()
 
-        .setTitle(
-            "🎫 AEGISNW Destek Merkezi"
-        )
+const embed =
+new EmbedBuilder()
 
-        .setDescription(`
-Destek almak için kategori seç:
+.setTitle(
+"⚔️ AEGISNW Yönetim Paneli"
+)
+
+.setDescription(`
+
+Sunucu yönetim paneli
+
+📢 Duyuru
+🗑️ Mesaj Temizleme
+🔒 Kanal Yönetimi
+📊 İstatistik
+🎭 Rol Yönetimi
+🎫 Ticket Yönetimi
+
+`)
+
+.setColor("#5865F2")
+
+.setFooter({
+text:"AEGISNW ADMIN PANEL"
+});
+
+
+
+const row1 =
+new ActionRowBuilder()
+
+.addComponents(
+
+new ButtonBuilder()
+
+.setCustomId("panel_clear")
+
+.setLabel("🗑️ Temizle")
+
+.setStyle(ButtonStyle.Danger),
+
+
+new ButtonBuilder()
+
+.setCustomId("panel_lock")
+
+.setLabel("🔒 Kilitle")
+
+.setStyle(ButtonStyle.Danger),
+
+
+new ButtonBuilder()
+
+.setCustomId("panel_unlock")
+
+.setLabel("🔓 Aç")
+
+.setStyle(ButtonStyle.Success)
+
+);
+
+
+
+const row2 =
+new ActionRowBuilder()
+
+.addComponents(
+
+new ButtonBuilder()
+
+.setCustomId("panel_stats")
+
+.setLabel("📊 İstatistik")
+
+.setStyle(ButtonStyle.Primary),
+
+
+new ButtonBuilder()
+
+.setCustomId("panel_announce")
+
+.setLabel("📢 Duyuru")
+
+.setStyle(ButtonStyle.Secondary),
+
+
+new ButtonBuilder()
+
+.setCustomId("panel_ticket")
+
+.setLabel("🎫 Ticket")
+
+.setStyle(ButtonStyle.Primary)
+
+);
+
+
+
+return message.channel.send({
+
+embeds:[embed],
+
+components:[
+row1,
+row2
+]
+
+});
+
+}
+
+
+
+
+// =====================
+// 🎫 TICKET PANEL
+// =====================
+
+if(
+command === "!ticket" ||
+command === "!ticketpanel"
+){
+
+
+if(
+!message.member.permissions.has(
+PermissionFlagsBits.Administrator
+)
+)
+return message.reply(
+"❌ Yetkin yok."
+);
+
+
+
+const embed =
+new EmbedBuilder()
+
+.setTitle(
+"🎫 AEGISNW Destek Merkezi"
+)
+
+.setDescription(`
+
+Destek almak için kategori seçin:
 
 🐛 Bug Bildirme
-⚔️ Küfür / Hile
+
+⚔️ Küfür / Hile Bildirme
+
 💬 Genel Destek
+
 🎁 Ödül Talep
-        `)
 
-        .setColor("#5865F2");
+`)
 
+.setColor("#5865F2");
 
 
-        const row =
-        new ActionRowBuilder()
 
-        .addComponents(
 
-            new ButtonBuilder()
-            .setCustomId("ticket_bug")
-            .setLabel("🐛 Bug")
-            .setStyle(ButtonStyle.Danger),
+const row =
+new ActionRowBuilder()
 
+.addComponents(
 
-            new ButtonBuilder()
-            .setCustomId("ticket_report")
-            .setLabel("⚔️ Küfür/Hile")
-            .setStyle(ButtonStyle.Danger),
+new ButtonBuilder()
 
+.setCustomId("ticket_bug")
 
-            new ButtonBuilder()
-            .setCustomId("ticket_support")
-            .setLabel("💬 Destek")
-            .setStyle(ButtonStyle.Primary),
+.setLabel("🐛 Bug")
 
+.setStyle(ButtonStyle.Danger),
 
-            new ButtonBuilder()
-            .setCustomId("ticket_reward")
-            .setLabel("🎁 Ödül")
-            .setStyle(ButtonStyle.Success)
 
-        );
+new ButtonBuilder()
 
+.setCustomId("ticket_report")
 
-        return message.channel.send({
+.setLabel("⚔️ Küfür/Hile")
 
-            embeds:[embed],
+.setStyle(ButtonStyle.Danger),
 
-            components:[row]
 
-        });
+new ButtonBuilder()
 
-    }
+.setCustomId("ticket_support")
 
+.setLabel("💬 Destek")
 
+.setStyle(ButtonStyle.Primary),
 
-    // =====================
-    // PANEL
-    // =====================
 
-    if(command === "!panel"){
+new ButtonBuilder()
 
+.setCustomId("ticket_reward")
 
-        if(
-            !message.member.permissions.has(
-                PermissionFlagsBits.Administrator
-            )
-        )
-        return;
+.setLabel("🎁 Ödül")
 
+.setStyle(ButtonStyle.Success)
 
-        const embed =
-        new EmbedBuilder()
+);
 
-        .setTitle(
-            "⚔️ AEGISNW Yönetim Paneli"
-        )
 
-        .setDescription(`
-🗑️ Clear
-🔒 Lock
-🔓 Unlock
-🎫 Ticket
-🎉 Çekiliş
-🎁 Drop
-👥 Rol Yönetimi
-        `)
 
-        .setColor("#5865F2");
+return message.channel.send({
 
+embeds:[embed],
 
-        return message.channel.send({
+components:[row]
 
-            embeds:[embed]
+});
 
-        });
+}
+    
+// =====================
+// TICKET AÇMA
+// =====================
 
-    }
+if(
+command === "tickettest"
+){
+return;
+}
 
 
 
-    // =====================
-    // ÇEKİLİŞ
-    // =====================
+// =====================
+// MUTE
+// =====================
 
-    if(command === "!cekilis"){
+if(command === "!mute"){
 
+const member =
+message.mentions.members.first();
 
-        if(
-            !message.member.permissions.has(
-                PermissionFlagsBits.Administrator
-            )
-        )
-        return;
 
+if(!member)
+return;
 
-        const time = args[0];
-        const winnerCount = Number(args[1]);
-        const prize = args.slice(2).join(" ");
 
+let role =
+message.guild.roles.cache.find(
+r=>r.name==="Muted"
+);
 
 
-        if(!time || !winnerCount || !prize)
-        return message.reply(
-            "!cekilis 1d 1 Nitro"
-        );
 
+if(!role){
 
-        const users = new Set();
+role =
+await message.guild.roles.create({
 
+name:"Muted",
 
+permissions:[]
 
-        const row =
-        new ActionRowBuilder()
+});
 
-        .addComponents(
 
-            new ButtonBuilder()
+message.guild.channels.cache.forEach(
+async(channel)=>{
 
-            .setCustomId("giveaway_join")
+await channel.permissionOverwrites.create(
+role,
+{
+SendMessages:false
+}
+);
 
-            .setLabel("🎉 Katıl (0)")
+}
 
-            .setStyle(ButtonStyle.Primary)
+);
 
-        );
+}
 
 
 
-        const msg =
-        await message.channel.send({
+await member.roles.add(role);
 
-            embeds:[
 
-                new EmbedBuilder()
+return message.reply(
+`🔇 ${member} susturuldu.`
+);
 
-                .setTitle("🎉 AEGISNW Çekiliş")
+}
 
-                .setDescription(
-`
-🎁 Ödül:
-**${prize}**
 
-🏆 Kazanan:
-${winnerCount}
 
-⏳ Süre:
-${time}
-`
-                )
+// =====================
+// UNMUTE
+// =====================
 
-                .setColor("#FEE75C")
+if(command === "!unmute"){
 
-            ],
+const member =
+message.mentions.members.first();
 
-            components:[row]
 
-        });
+if(!member)
+return;
 
 
+const role =
+message.guild.roles.cache.find(
+r=>r.name==="Muted"
+);
 
-        const collector =
-        msg.createMessageComponentCollector({
 
-            time:ms(time)
+if(role)
+await member.roles.remove(role);
 
-        });
 
 
-        collector.on("collect",async(i)=>{
+return message.reply(
+`🔊 ${member} susturması kaldırıldı.`
+);
 
-            users.add(i.user.id);
+}
 
 
-            await i.reply({
 
-                content:"🎉 Katıldın!",
+// =====================
+// ROLE ALL
+// =====================
 
-                ephemeral:true
+if(command === "!roleall"){
 
-            });
+if(
+!message.member.permissions.has(
+PermissionFlagsBits.Administrator
+)
+)
+return;
 
 
-        });
+const role =
+message.mentions.roles.first();
 
 
+if(!role)
+return message.reply(
+"Rol etiketle."
+);
 
-        collector.on("end",()=>{
 
 
-            const list=[...users];
+await message.guild.members.fetch();
 
 
-            if(!list.length)
-            return;
 
+message.guild.members.cache.forEach(
+async(member)=>{
 
-            const winner =
-            list[Math.floor(Math.random()*list.length)];
+if(!member.user.bot){
 
+await member.roles.add(role)
+.catch(()=>{});
 
+}
 
-            message.channel.send(
+}
 
-`
-🎊 Kazanan:
-<@${winner}>
+);
 
-🎁 Ödül:
-${prize}
 
-🎫 Ödül için ticket açınız.
-`
 
-            );
+return message.reply(
+"✅ Rol verme başladı."
+);
 
+}
 
-        });
 
 
-    }
 
+// =====================
+// UNROLE ALL
+// =====================
 
+if(command === "!unroleall"){
 
-    // =====================
-    // DROP
-    // =====================
+if(
+!message.member.permissions.has(
+PermissionFlagsBits.Administrator
+)
+)
+return;
 
-    if(command === "!drop"){
 
+const role =
+message.mentions.roles.first();
 
-        if(
-            !message.member.permissions.has(
-                PermissionFlagsBits.Administrator
-            )
-        )
-        return;
 
+if(!role)
+return;
 
-        const prize =
-        args.join(" ");
 
 
-        if(!prize)
-        return;
+await message.guild.members.fetch();
 
 
-        const row =
-        new ActionRowBuilder()
 
-        .addComponents(
+message.guild.members.cache.forEach(
+async(member)=>{
 
-            new ButtonBuilder()
 
-            .setCustomId("drop_win")
+await member.roles.remove(role)
+.catch(()=>{});
 
-            .setLabel("🎁 Al")
 
-            .setStyle(ButtonStyle.Success)
+}
 
-        );
+);
 
 
 
-        const msg =
-        await message.channel.send({
+return message.reply(
+"✅ Rol alma başladı."
+);
 
-            embeds:[
-
-                new EmbedBuilder()
-
-                .setTitle("🎁 AEGISNW DROP")
-
-                .setDescription(
-                    `Ödül: **${prize}**`
-                )
-
-                .setColor("#00FF00")
-
-            ],
-
-            components:[row]
-
-        });
-
-
-
-        const collector =
-        msg.createMessageComponentCollector({
-
-            max:1
-
-        });
-
-
-
-        collector.on("collect",async(i)=>{
-
-
-            await i.reply(
-
-`
-🎉 ${i.user} kazandı!
-
-🎁 Ödül:
-${prize}
-
-🎫 Ticket açarak alabilirsiniz.
-`
-
-            );
-
-
-        });
-
-
-    }
-    });
-
-
+}
+    
 // =====================
 // BUTTON SYSTEM
 // =====================
@@ -803,240 +1076,729 @@ client.on(
 async(interaction)=>{
 
 
-    if(!interaction.isButton())
-    return;
+if(!interaction.isButton())
+return;
 
 
 
-    // =====================
-    // TICKET AÇMA
-    // =====================
+// =====================
+// TICKET AÇ
+// =====================
 
-    if(
-        interaction.customId.startsWith("ticket_")
-    ){
+if(
+interaction.customId.startsWith("ticket_")
+){
 
 
-        if(
-            activeTickets.has(
-                interaction.user.id
-            )
-        ){
 
-            return interaction.reply({
+if(
+activeTickets.has(
+interaction.user.id
+)
+){
 
-                content:
-                "❌ Zaten açık ticketin var.",
+return interaction.reply({
 
-                ephemeral:true
+content:
+"❌ Zaten açık ticketin var.",
 
-            });
+ephemeral:true
 
-        }
+});
 
+}
 
 
-        const type =
-        interaction.customId
-        .replace("ticket_","")
-        .toUpperCase();
 
+const type =
+interaction.customId
+.replace("ticket_","")
+.toUpperCase();
 
 
-        const channel =
-        await interaction.guild.channels.create({
 
-            name:
-            `ticket-${interaction.user.username}`,
+const channel =
+await interaction.guild.channels.create({
 
-            type:
-            ChannelType.GuildText,
+name:
+`ticket-${interaction.user.username}`,
 
-            parent:
-            CONFIG.TICKET_CATEGORY,
+type:
+ChannelType.GuildText,
 
 
-            permissionOverwrites:[
+parent:
+CONFIG.TICKET_CATEGORY,
 
-                {
 
-                    id:
-                    interaction.guild.id,
+permissionOverwrites:[
 
-                    deny:[
-                        PermissionFlagsBits.ViewChannel
-                    ]
+{
 
-                },
+id:
+interaction.guild.id,
 
+deny:[
 
-                {
+PermissionFlagsBits.ViewChannel
 
-                    id:
-                    interaction.user.id,
+]
 
-                    allow:[
+},
 
-                        PermissionFlagsBits.ViewChannel,
 
-                        PermissionFlagsBits.SendMessages,
+{
 
-                        PermissionFlagsBits.ReadMessageHistory
+id:
+interaction.user.id,
 
-                    ]
+allow:[
 
-                }
+PermissionFlagsBits.ViewChannel,
 
-            ]
+PermissionFlagsBits.SendMessages,
 
-        });
+PermissionFlagsBits.ReadMessageHistory
 
+]
 
+}
 
-        activeTickets.set(
-            interaction.user.id,
-            channel.id
-        );
+]
 
+});
 
 
-        await channel.send({
 
-            embeds:[
+activeTickets.set(
 
-                new EmbedBuilder()
+interaction.user.id,
 
-                .setTitle(
-                    `🎫 ${type} Ticket`
-                )
+channel.id
 
-                .setDescription(
-                    `Merhaba ${interaction.user}\n\nYetkililer ilgilenecek.`
-                )
+);
 
-                .setColor("#5865F2")
 
-            ],
 
-            components:[
+await channel.send({
 
-                new ActionRowBuilder()
+embeds:[
 
-                .addComponents(
+new EmbedBuilder()
 
-                    new ButtonBuilder()
+.setTitle(
+`🎫 ${type} Ticket`
+)
 
-                    .setCustomId("ticket_close")
+.setDescription(
 
-                    .setLabel("🔒 Kapat")
+`Merhaba ${interaction.user}
 
-                    .setStyle(ButtonStyle.Danger)
+Yetkililer kısa sürede ilgilenecek.`
 
-                )
+)
 
-            ]
+.setColor("#5865F2")
 
-        });
+],
 
+components:[
 
+new ActionRowBuilder()
 
-        return interaction.reply({
+.addComponents(
 
-            content:
-            `✅ Ticket açıldı: ${channel}`,
+new ButtonBuilder()
 
-            ephemeral:true
+.setCustomId(
+"ticket_close"
+)
 
-        });
+.setLabel(
+"🔒 Kapat"
+)
 
+.setStyle(
+ButtonStyle.Danger
+)
 
-    }
+)
 
+]
 
+});
 
-    // =====================
-    // TICKET KAPAT
-    // =====================
 
-    if(
-        interaction.customId === "ticket_close"
-    ){
 
-        activeTickets.forEach(
-            (channel,user)=>{
+return interaction.reply({
 
-                if(
-                    channel === interaction.channel.id
-                ){
+content:
+`✅ Ticket açıldı: ${channel}`,
 
-                    activeTickets.delete(user);
+ephemeral:true
 
-                }
+});
 
-            }
-        );
 
+}
 
-        await interaction.reply(
-            "🔒 Ticket kapanıyor..."
-        );
 
 
-        setTimeout(()=>{
+// =====================
+// TICKET KAPAT
+// =====================
 
-            interaction.channel.delete()
-            .catch(()=>{});
+if(
+interaction.customId === "ticket_close"
+){
 
-        },3000);
 
+activeTickets.forEach(
+(id,user)=>{
 
-    }
 
+if(
+id === interaction.channel.id
+){
 
+activeTickets.delete(user);
 
-    // =====================
-    // ÇEKİLİŞ BUTONU
-    // =====================
+}
 
-    if(
-        interaction.customId === "giveaway_join"
-    ){
+}
 
-        return interaction.reply({
+);
 
-            content:
-            "🎉 Çekilişe katıldın!",
 
-            ephemeral:true
 
-        });
+await interaction.reply(
+"🔒 Ticket kapanıyor..."
+);
 
-    }
 
 
+setTimeout(()=>{
 
-    // =====================
-    // DROP BUTONU
-    // =====================
+interaction.channel.delete()
+.catch(()=>{});
 
-    if(
-        interaction.customId === "drop_win"
-    ){
+},3000);
 
-        return interaction.reply({
 
-            content:
-            `🎁 ${interaction.user} kazandı!\n\n🎫 Ödül için ticket açınız.`,
+}
 
-            ephemeral:false
 
-        });
 
-    }
+
+// =====================
+// DROP
+// =====================
+
+if(
+interaction.customId === "drop_button"
+){
+
+
+return interaction.reply({
+
+content:
+
+`🎁 ${interaction.user} kazandı!
+
+🎫 Ödülü almak için ticket açınız.`,
+
+ephemeral:false
+
+});
+
+
+}
+
+
+
+
+// =====================
+// ÇEKİLİŞ KATIL
+// =====================
+
+if(
+interaction.customId === "giveaway_join"
+){
+
+
+return interaction.reply({
+
+content:
+"🎉 Çekilişe katıldın!",
+
+ephemeral:true
+
+});
+
+
+}
+
+
+});
+    
+// =====================
+// ÇEKİLİŞ
+// =====================
+
+if(command === "!cekilis"){
+
+
+if(
+!message.member.permissions.has(
+PermissionFlagsBits.Administrator
+)
+)
+return;
+
+
+
+const time =
+args[0];
+
+const winnerCount =
+Number(args[1]);
+
+const prize =
+args.slice(2).join(" ");
+
+
+
+if(
+!time ||
+!winnerCount ||
+!prize
+)
+return message.reply(
+"!cekilis 1d 1 Nitro"
+);
+
+
+
+const users =
+new Set();
+
+
+
+const row =
+new ActionRowBuilder()
+
+.addComponents(
+
+new ButtonBuilder()
+
+.setCustomId(
+"giveaway_join"
+)
+
+.setLabel(
+"🎉 Katıl (0)"
+)
+
+.setStyle(
+ButtonStyle.Primary
+)
+
+);
+
+
+
+const msg =
+await message.channel.send({
+
+embeds:[
+
+new EmbedBuilder()
+
+.setTitle(
+"🎉 AEGISNW Çekiliş"
+)
+
+.setDescription(`
+
+🎁 Ödül:
+**${prize}**
+
+🏆 Kazanan:
+${winnerCount}
+
+⏳ Süre:
+${time}
+
+Katılmak için butona bas.
+
+`)
+
+.setColor("#FEE75C")
+
+],
+
+components:[row]
+
+});
+
+
+
+const collector =
+msg.createMessageComponentCollector({
+
+time:ms(time)
+
+});
+
+
+
+collector.on(
+"collect",
+async(i)=>{
+
+
+users.add(i.user.id);
+
+
+row.components[0]
+.setLabel(
+`🎉 Katıl (${users.size})`
+);
+
+
+
+await msg.edit({
+
+components:[row]
+
+});
+
+
+i.reply({
+
+content:
+"🎉 Katıldın!",
+
+ephemeral:true
+
+});
 
 
 });
 
+
+
+collector.on(
+"end",
+()=>{
+
+
+const list =
+[...users];
+
+
+if(!list.length)
+return;
+
+
+
+const winners=[];
+
+
+
+for(
+let i=0;
+i<Math.min(
+winnerCount,
+list.length
+);
+i++
+){
+
+
+winners.push(
+
+list.splice(
+
+Math.floor(
+Math.random()*list.length
+),
+
+1
+
+)[0]
+
+);
+
+
+}
+
+
+
+message.channel.send(`
+
+🎊 **Çekiliş Bitti**
+
+🏆 Kazanan:
+
+${winners.map(x=>`<@${x}>`).join(", ")}
+
+
+🎁 Ödül:
+${prize}
+
+
+🎫 Ödül için ticket açınız.
+
+`);
+
+});
+
+
+}
+
+
+
+
+// =====================
+// DROP
+// =====================
+
+if(command === "!drop"){
+
+
+if(
+!message.member.permissions.has(
+PermissionFlagsBits.Administrator
+)
+)
+return;
+
+
+
+const prize =
+args.join(" ");
+
+
+
+if(!prize)
+return;
+
+
+
+const row =
+new ActionRowBuilder()
+
+.addComponents(
+
+new ButtonBuilder()
+
+.setCustomId(
+"drop_button"
+)
+
+.setLabel(
+"🎁 Ödülü Al"
+)
+
+.setStyle(
+ButtonStyle.Success
+)
+
+);
+
+
+
+await message.channel.send({
+
+embeds:[
+
+new EmbedBuilder()
+
+.setTitle(
+"🎁 AEGISNW DROP"
+)
+
+.setDescription(
+
+`Ödül:
+
+**${prize}**
+
+İlk basan kazanır.`
+
+)
+
+.setColor("#00FF00")
+
+],
+
+components:[row]
+
+});
+
+
+}
+
+
+
+// =====================
+// DUYURU
+// =====================
+
+if(command === "!announce"){
+
+
+if(
+!message.member.permissions.has(
+PermissionFlagsBits.Administrator
+)
+)
+return;
+
+
+
+const text =
+args.join(" ");
+
+
+
+if(!text)
+return;
+
+
+
+const embed =
+new EmbedBuilder()
+
+.setTitle(
+"📢 AEGISNW DUYURU"
+)
+
+.setDescription(text)
+
+.setColor("#FEE75C")
+
+.setTimestamp();
+
+
+
+const duyuru =
+message.guild.channels.cache.get(
+CONFIG.DUYURU
+);
+
+
+const sohbet =
+message.guild.channels.cache.get(
+CONFIG.SOHBET
+);
+
+
+
+if(duyuru){
+
+duyuru.send({
+
+content:
+"@everyone @here",
+
+embeds:[embed]
+
+});
+
+}
+
+
+
+if(sohbet){
+
+sohbet.send({
+
+embeds:[embed]
+
+});
+
+}
+
+
+
+message.reply(
+"✅ Duyuru gönderildi."
+);
+
+
+}
+
+
+
+// =====================
+// INVITE
+// =====================
+
+if(command === "!invite"){
+
+
+const invites =
+await message.guild.invites.fetch();
+
+
+let count=0;
+
+
+
+invites.forEach(inv=>{
+
+
+if(
+inv.inviter &&
+inv.inviter.id === message.author.id
+){
+
+count += inv.uses || 0;
+
+}
+
+
+});
+
+
+
+return message.channel.send({
+
+embeds:[
+
+new EmbedBuilder()
+
+.setTitle(
+"📨 Davet İstatistik"
+)
+
+.setDescription(
+
+`👤 Kullanıcı:
+${message.author}
+
+
+📨 Davet:
+**${count}**`
+
+)
+
+.setColor("#5865F2")
+
+]
+
+});
+
+
+}
+
+
+
+// =====================
+// LOGIN
+// =====================
 
 client.login(
 process.env.TOKEN
