@@ -23,7 +23,6 @@ const client = new Client({
     ]
 });
 
-// Sabit ID'ler
 const CONFIG = {
     ONERI_KANAL_ID: "1534594853751492832",
     OTOROL_ID: "1534594823686717733",
@@ -32,14 +31,12 @@ const CONFIG = {
     KURUCU_ID: "1339146423433953300"
 };
 
-// Davet Takip Haritası
 const invites = new Collection();
 
 client.once("ready", async () => {
     console.log(`[BOT] ${client.user.tag} aktif!`);
     client.user.setActivity("AEGISNW | !ip", { type: 0 });
 
-    // Davetleri hafızaya al
     client.guilds.cache.forEach(async (guild) => {
         try {
             const firstInvites = await guild.invites.fetch();
@@ -50,7 +47,6 @@ client.once("ready", async () => {
     });
 });
 
-// Otorol Sistemi
 client.on("guildMemberAdd", async (member) => {
     try {
         const role = member.guild.roles.cache.get(CONFIG.OTOROL_ID);
@@ -60,14 +56,12 @@ client.on("guildMemberAdd", async (member) => {
     }
 });
 
-// Mesaj Komutları
 client.on("messageCreate", async (message) => {
     if (message.author.bot || !message.guild) return;
 
     const args = message.content.trim().split(/ +/);
     const command = args.shift().toLowerCase();
 
-    // 1. MC IP
     if (command === "!ip") {
         const embed = new EmbedBuilder()
             .setTitle("🌐 AEGISNW Sunucu Bilgileri")
@@ -83,7 +77,6 @@ client.on("messageCreate", async (message) => {
         return message.channel.send({ embeds: [embed] });
     }
 
-    // 2. Öneri Sistemi
     if (command === "!öneri" || command === "!oneri") {
         if (message.channel.id !== CONFIG.ONERI_KANAL_ID) {
             return message.reply(`Bu komut sadece <#${CONFIG.ONERI_KANAL_ID}> kanalında kullanılabilir!`);
@@ -107,7 +100,6 @@ client.on("messageCreate", async (message) => {
         return message.channel.send({ embeds: [embed], components: [row] });
     }
 
-    // 3. Ticket Paneli Gönder
     if (command === "!ticketpanel") {
         if (!message.member.permissions.has(PermissionFlagsBits.Administrator)) return;
         
@@ -126,14 +118,12 @@ client.on("messageCreate", async (message) => {
         return message.channel.send({ embeds: [embed], components: [row] });
     }
 
-    // 4. Yönetici Görsel Admin Paneli
     if (command === "!panel") {
         if (!message.member.permissions.has(PermissionFlagsBits.Administrator)) return;
 
         const embed = new EmbedBuilder()
             .setDescription("Bu panel üzerinden sunucu genelinde kritik işlemleri hızlıca gerçekleştirebilirsiniz. Lütfen dikkatli kullanın.")
-            .setColor("#2b2d31")
-            .setImage("https://media.discordapp.net/attachments/1000000000000000000/1000000000000000000/banner.png"); // İsteğe bağlı banner görseli
+            .setColor("#2b2d31");
 
         const row1 = new ActionRowBuilder().addComponents(
             new ButtonBuilder().setCustomId("p_dm").setLabel("DM Gönder").setStyle(ButtonStyle.Primary).setEmoji("👤"),
@@ -168,7 +158,6 @@ client.on("messageCreate", async (message) => {
         return message.channel.send({ embeds: [embed], components: [row1, row2, row3, row4, row5] });
     }
 
-    // 5. Çekiliş Sistemi
     if (command === "!cekilis") {
         if (!message.member.permissions.has(PermissionFlagsBits.Administrator)) return;
         const sürestraz = args[0];
@@ -229,7 +218,6 @@ client.on("messageCreate", async (message) => {
         });
     }
 
-    // 6. Drop Sistemi
     if (command === "!drop") {
         if (!message.member.permissions.has(PermissionFlagsBits.Administrator)) return;
         const odul = args.join(" ");
@@ -256,7 +244,6 @@ client.on("messageCreate", async (message) => {
         });
     }
 
-    // 7. Duyuru Sistemi
     if (command === "!announce" || command === "!duyuru") {
         if (!message.member.permissions.has(PermissionFlagsBits.Administrator)) return;
         const duyuruText = args.join(" ");
@@ -275,12 +262,11 @@ client.on("messageCreate", async (message) => {
             await duyuruKanal.send({ content: "@everyone @here", embeds: [embed] });
         }
         if (sohbetKanal) {
-            await sohbetKanal.send({ embeds: [embed] }); // sohbet kanalında everyone/here yok
+            await sohbetKanal.send({ embeds: [embed] });
         }
         return message.reply("Duyuru başarıyla gönderildi!");
     }
 
-    // Moderasyon Komutları
     if (command === "!clear") {
         if (!message.member.permissions.has(PermissionFlagsBits.ManageMessages)) return;
         const amount = parseInt(args[0]);
@@ -321,7 +307,7 @@ client.on("messageCreate", async (message) => {
         if (!message.member.permissions.has(PermissionFlagsBits.ModerateMembers)) return;
         const target = message.mentions.members.first();
         if (!target) return message.reply("Bir üye etiketleyin.");
-        await target.timeout(10 * 60 * 1000); // 10 Dakika varsayılan
+        await target.timeout(10 * 60 * 1000);
         return message.reply(`${target.user.tag} 10 dakika susturuldu.`);
     }
 
@@ -333,7 +319,6 @@ client.on("messageCreate", async (message) => {
         return message.reply(`${target.user.tag} susturması kaldırıldı.`);
     }
 
-    // Toplu Rol Verme / Alma
     if (command === "!roleall") {
         if (!message.member.permissions.has(PermissionFlagsBits.Administrator)) return;
         const role = message.mentions.roles.first();
@@ -352,7 +337,6 @@ client.on("messageCreate", async (message) => {
         return message.reply(`Tüm üyelerden ${role.name} rolü alınmaya başlandı.`);
     }
 
-    // Bilgi Komutları
     if (command === "!serverinfo") {
         const guild = message.guild;
         const members = await guild.members.fetch();
@@ -395,11 +379,9 @@ client.on("messageCreate", async (message) => {
     }
 });
 
-// Buton Etkileşimleri (Ticket / Öneri / Admin Panel)
 client.on("interactionCreate", async (interaction) => {
     if (!interaction.isButton()) return;
 
-    // Ticket Butonları
     if (interaction.customId.startsWith("ticket_")) {
         const type = interaction.customId.replace("ticket_", "").toUpperCase();
         
@@ -430,10 +412,8 @@ client.on("interactionCreate", async (interaction) => {
         setTimeout(() => interaction.channel.delete().catch(() => {}), 5000);
     }
 
-    // Öneri Oylama
     if (interaction.customId === "oneri_evet" || interaction.customId === "oneri_hayir") {
         const message = interaction.message;
-        const embed = message.embeds[0];
         
         let evetCount = parseInt(message.components[0].components[0].label.match(/\d+/)[0]);
         let hayirCount = parseInt(message.components[0].components[1].label.match(/\d+/)[0]);
@@ -442,4 +422,20 @@ client.on("interactionCreate", async (interaction) => {
         if (interaction.customId === "oneri_hayir") hayirCount++;
 
         const newRow = new ActionRowBuilder().addComponents(
-            new ButtonBuilder().setCustomId("oneri_evet").setLabel(`Evet (${evetCount})
+            new ButtonBuilder().setCustomId("oneri_evet").setLabel(`Evet (${evetCount})`).setStyle(ButtonStyle.Success),
+            new ButtonBuilder().setCustomId("oneri_hayir").setLabel(`Hayır (${hayirCount})`).setStyle(ButtonStyle.Danger)
+        );
+
+        await message.edit({ components: [newRow] });
+        return interaction.reply({ content: "Oyunuz kaydedildi!", ephemeral: true });
+    }
+
+    if (interaction.customId.startsWith("p_")) {
+        if (!interaction.member.permissions.has(PermissionFlagsBits.Administrator)) {
+            return interaction.reply({ content: "Bu butonu kullanma yetkiniz yok!", ephemeral: true });
+        }
+        return interaction.reply({ content: `🔧 **${interaction.customId}** işlemi tetiklendi.`, ephemeral: true });
+    }
+});
+
+client.login(process.env.DIS
