@@ -1313,41 +1313,363 @@ Yetkililer en kısa sürede ilgilenecek.`
 
     }
     // =====================
-// TICKET CLOSE
+// ÇEKİLİŞ
 // =====================
 
-if(
-interaction.customId === "ticket_close"
-){
-
-    await interaction.reply({
-        content:"🔒 Ticket kapatılıyor...",
-        ephemeral:true
-    });
+if(command === "!cekilis"){
 
 
-    activeTickets.forEach(
-        (channel,user)=>{
+    if(
+        !message.member.permissions.has(
+            PermissionFlagsBits.Administrator
+        )
+    )
+    return;
 
-            if(
-                channel === interaction.channel.id
-            ){
 
-                activeTickets.delete(user);
+    const time = args[0];
+    const winners = Number(args[1]);
+    const prize = args.slice(2).join(" ");
 
-            }
 
-        }
+
+    if(
+        !time ||
+        !winners ||
+        !prize
+    )
+    return message.reply(
+        "Kullanım: !cekilis 1d 1 Nitro"
     );
 
 
-    setTimeout(()=>{
 
-        interaction.channel.delete()
-        .catch(()=>{});
+    const joined = new Set();
 
-    },3000);
+
+
+    const embed =
+    new EmbedBuilder()
+
+    .setTitle(
+        "🎉 AEGISNW Çekiliş"
+    )
+
+    .setDescription(
+
+`🎁 Ödül:
+**${prize}**
+
+🏆 Kazanan:
+${winners}
+
+⏳ Süre:
+${time}
+
+Katılmak için butona basın.`
+
+    )
+
+    .setColor("#FEE75C");
+
+
+
+    const row =
+    new ActionRowBuilder()
+
+    .addComponents(
+
+        new ButtonBuilder()
+
+        .setCustomId("giveaway_join")
+
+        .setLabel("🎉 Katıl (0)")
+
+        .setStyle(ButtonStyle.Primary)
+
+    );
+
+
+
+    const msg =
+    await message.channel.send({
+
+        embeds:[embed],
+
+        components:[row]
+
+    });
+
+
+
+    const collector =
+    msg.createMessageComponentCollector({
+
+        time:ms(time)
+
+    });
+
+
+
+    collector.on(
+    "collect",
+    async(i)=>{
+
+
+        if(joined.has(i.user.id)){
+
+            return i.reply({
+
+                content:
+                "❌ Zaten katıldın.",
+
+                ephemeral:true
+
+            });
+
+        }
+
+
+        joined.add(i.user.id);
+
+
+
+        row.components[0]
+        .setLabel(
+            `🎉 Katıl (${joined.size})`
+        );
+
+
+        await msg.edit({
+
+            components:[row]
+
+        });
+
+
+        i.reply({
+
+            content:
+            "🎉 Çekilişe katıldın!",
+
+            ephemeral:true
+
+        });
+
+
+    });
+
+
+
+    collector.on(
+    "end",
+    ()=>{
+
+
+        if(joined.size === 0){
+
+            return message.channel.send(
+                "❌ Katılan olmadı."
+            );
+
+        }
+
+
+
+        const users =
+        [...joined];
+
+
+        const win = [];
+
+
+        for(
+            let i=0;
+            i<Math.min(
+                winners,
+                users.length
+            );
+            i++
+        ){
+
+            win.push(
+
+                users.splice(
+
+                    Math.floor(
+                        Math.random()*users.length
+                    ),
+
+                    1
+
+                )[0]
+
+            );
+
+        }
+
+
+
+        message.channel.send(
+
+`🎊 **Çekiliş Bitti!**
+
+🏆 Kazananlar:
+${win.map(x=>`<@${x}>`).join(", ")}
+
+🎁 Ödül:
+${prize}
+
+🎫 Ödülünüzü almak için ticket açınız.`
+
+        );
+
+
+    });
+
 
 }
 
+
+
+
+// =====================
+// DROP
+// =====================
+
+if(command === "!drop"){
+
+
+    if(
+        !message.member.permissions.has(
+            PermissionFlagsBits.Administrator
+        )
+    )
+    return;
+
+
+
+    const prize =
+    args.join(" ");
+
+
+
+    if(!prize)
+    return message.reply(
+        "Ödül yaz."
+    );
+
+
+
+    const row =
+    new ActionRowBuilder()
+
+    .addComponents(
+
+        new ButtonBuilder()
+
+        .setCustomId("drop_button")
+
+        .setLabel("🎁 Ödülü Al")
+
+        .setStyle(ButtonStyle.Success)
+
+    );
+
+
+
+    const embed =
+    new EmbedBuilder()
+
+    .setTitle(
+        "🎁 AEGISNW DROP"
+    )
+
+    .setDescription(
+
+`Ödül:
+
+**${prize}**
+
+İlk basan kişi kazanır!`
+
+    )
+
+    .setColor("#00FF00");
+
+
+
+    const msg =
+    await message.channel.send({
+
+        embeds:[embed],
+
+        components:[row]
+
+    });
+
+
+
+    const collector =
+    msg.createMessageComponentCollector({
+
+        max:1
+
+    });
+
+
+
+    collector.on(
+    "collect",
+    async(i)=>{
+
+
+        row.components[0]
+        .setDisabled(true);
+
+
+
+        await msg.edit({
+
+            components:[row]
+
+        });
+
+
+
+        i.reply(
+
+`🎉 Tebrikler ${i.user}!
+
+🎁 Ödül:
+**${prize}**
+
+🎫 Ödülünüzü almak için ticket açınız.`
+
+        );
+
+
+    });
+
+
+}
+
+
+
+
+
+// =====================
+// BUTTON SYSTEM CLOSE
+// =====================
+
 });
+
+
+
+// =====================
+// LOGIN
+// =====================
+
+client.login(
+    process.env.TOKEN
+);
