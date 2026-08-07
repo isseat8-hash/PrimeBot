@@ -538,58 +538,6 @@ client.on(Events.InteractionCreate, async interaction => {
 
         .setDescription(
 
-`Kategori: **${kategori}**
-
-Yetkililer en kısa sürede sizinle ilgilenecektir.`
-
-        )
-
-        .setTimestamp();
-
-    await channel.send({
-
-        content: `${interaction.user}`,
-
-        embeds: [embed],
-
-        components: [closeRow]
-
-    });
-
-    interaction.reply({
-
-        content: `✅ Ticket oluşturuldu: ${channel}`,
-
-        ephemeral: true
-
-    });
-
-});
-/* =========================
-      TICKET KAPAT
-========================= */
-
-client.on(Events.InteractionCreate, async interaction => {
-
-    if (!interaction.isButton()) return;
-
-    if (interaction.customId !== "ticket_close") return;
-
-    tickets.delete(interaction.user.id);
-
-    await interaction.reply({
-
-        content: "🔒 Ticket 5 saniye içinde kapanacak."
-
-    });
-
-    setTimeout(() => {
-
-        interaction.channel.delete().catch(() => {});
-
-    }, 5000);
-
-});
 /* ===========================
       TICKET OLUŞTURMA
 =========================== */
