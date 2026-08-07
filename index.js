@@ -484,59 +484,6 @@ client.on(Events.InteractionCreate, async interaction => {
 
             {
 
-                id: interaction.guild.id,
-
-                deny: [
-                    PermissionsBitField.Flags.ViewChannel
-                ]
-
-            },
-
-            {
-
-                id: interaction.user.id,
-
-                allow: [
-
-                    PermissionsBitField.Flags.ViewChannel,
-
-                    PermissionsBitField.Flags.SendMessages,
-
-                    PermissionsBitField.Flags.ReadMessageHistory
-
-                ]
-
-            }
-
-        ]
-
-    });
-
-    tickets.set(interaction.user.id, channel.id);
-
-    const closeRow = new ActionRowBuilder()
-
-        .addComponents(
-
-            new ButtonBuilder()
-
-            .setCustomId("ticket_close")
-
-            .setEmoji("🔒")
-
-            .setLabel("Ticket Kapat")
-
-            .setStyle(ButtonStyle.Danger)
-
-        );
-
-    const embed = new EmbedBuilder()
-
-        .setColor("Green")
-
-        .setTitle("🎫 Ticket Açıldı")
-
-        .setDescription(
 
 /* ===========================
       TICKET OLUŞTURMA
