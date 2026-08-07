@@ -162,9 +162,9 @@ client.on("messageCreate", async(message)=>{
 
 
     const args =
-    message.content
-    .trim()
-    .split(/ +);
+message.content
+.trim()
+.split(/ +/);
 
 
 
