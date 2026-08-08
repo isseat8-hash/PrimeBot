@@ -9,7 +9,11 @@ const {
     ButtonBuilder,
     ButtonStyle,
     StringSelectMenuBuilder,
-StringSelectMenuOptionBuilder,
+    StringSelectMenuOptionBuilder,
+    ChannelSelectMenuBuilder,
+    ModalBuilder,
+    TextInputBuilder,
+    TextInputStyle,
     PermissionsBitField,
     ChannelType,
     Events
