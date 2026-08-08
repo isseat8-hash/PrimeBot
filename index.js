@@ -881,22 +881,24 @@ client.on("interactionCreate", async interaction => {
     drops.delete(interaction.message.id);
 
 });
-/* =========================
-       👑 ADMIN PANEL
-========================= */
+/* =========================================
+        👑 PRIMELEGACY ADMIN PANEL
+========================================= */
 
 client.on(Events.MessageCreate, async (message) => {
 
     if (message.author.bot) return;
+
     if (message.content !== "!panel") return;
 
-    // Sadece Administrator
     if (!message.member.permissions.has(
         PermissionsBitField.Flags.Administrator
     )) {
         return message.reply({
-            content: "❌ Bu paneli kullanmak için Administrator yetkisine sahip olmalısın.",
-            allowedMentions: { repliedUser: false }
+            content: "❌ Bu komutu kullanmak için Administrator yetkisine sahip olmalısın.",
+            allowedMentions: {
+                repliedUser: false
+            }
         });
     }
 
@@ -907,16 +909,16 @@ client.on(Events.MessageCreate, async (message) => {
 `Sunucu yönetim işlemlerini aşağıdaki butonlardan gerçekleştirebilirsin.
 
 🎫 **Ticket Paneli**
-Ticket panelinin gönderileceği kanalı seç.
+Ticket panelini istediğin kanala gönder.
 
 📢 **Duyuru**
-Duyuru mesajı oluştur ve otomatik olarak gerekli kanallara gönder.
+Duyuru mesajı oluştur ve belirlenen kanallara gönder.
 
 🧹 **Mesaj Temizle**
-Kanal seçerek belirlediğin miktarda mesaj sil.
+Seçilen kanaldan belirlenen miktarda mesaj sil.
 
 🔒 **Kanal Kilitle**
-Seçilen kanalı üyelerin mesaj göndermesine kapat.
+Seçilen kanalı üyelerin mesaj yazmasına kapat.
 
 🔓 **Kanal Aç**
 Seçilen kanalın kilidini kaldır.
@@ -925,7 +927,7 @@ Seçilen kanalın kilidini kaldır.
 Kanal, ödül, süre ve kazanan sayısını belirle.
 
 🎁 **Drop**
-Kanal, ödül ve süre belirle.`)
+Kanal, ödül ve süre belirleyerek drop oluştur.`)
         .setFooter({
             text: "PrimeLegacy • Yönetici Paneli"
         })
@@ -988,39 +990,199 @@ Kanal, ödül ve süre belirle.`)
         components: [row1, row2]
     });
 
+});
+
+
+/* =========================================
+      👑 ADMIN PANEL BUTONLARI
+========================================= */
+
 client.on(Events.InteractionCreate, async (interaction) => {
 
     if (!interaction.isButton()) return;
 
-    if (!interaction.customId.startsWith("admin_")) return;
+    const adminButtons = [
+        "admin_ticket",
+        "admin_announce",
+        "admin_clear",
+        "admin_lock",
+        "admin_unlock",
+        "admin_giveaway",
+        "admin_drop"
+    ];
+
+    if (!adminButtons.includes(interaction.customId))
+        return;
+
+    /* =========================
+          ADMIN KONTROLÜ
+    ========================= */
 
     if (!interaction.member.permissions.has(
         PermissionsBitField.Flags.Administrator
     )) {
+
         return interaction.reply({
-            content: "❌ Administrator yetkin yok.",
+            content: "❌ Bu butonu kullanmak için Administrator yetkisine sahip olmalısın.",
             ephemeral: true
         });
+
     }
 
-    const messages = {
-        admin_ticket: "🎫 Ticket Panel butonuna bastın.",
-        admin_announce: "📢 Duyuru butonuna bastın.",
-        admin_clear: "🧹 Mesaj Temizle butonuna bastın.",
-        admin_lock: "🔒 Kanal Kilitle butonuna bastın.",
-        admin_unlock: "🔓 Kanal Aç butonuna bastın.",
-        admin_giveaway: "🎉 Çekiliş butonuna bastın.",
-        admin_drop: "🎁 Drop butonuna bastın."
-    };
 
-    const response = messages[interaction.customId];
+    /* =========================
+          TICKET PANEL
+    ========================= */
 
-    if (!response) return;
+    if (interaction.customId === "admin_ticket") {
 
-    await interaction.reply({
-        content: response,
-        ephemeral: true
-    });
+        return interaction.reply({
+            content:
+`🎫 **Ticket Paneli**
+
+Ticket panelinin gönderileceği kanalı seçme sistemi bir sonraki bölümde bağlanacak.
+
+📌 Panelden kanal seçilecek.
+📌 Seçilen kanala ticket paneli gönderilecek.
+📌 Ticket butonlarını herkes kullanabilecek.`,
+            ephemeral: true
+        });
+
+    }
+
+
+    /* =========================
+             DUYURU
+    ========================= */
+
+    if (interaction.customId === "admin_announce") {
+
+        return interaction.reply({
+            content:
+`📢 **Duyuru Sistemi**
+
+Duyuru mesajı için kullanılacak yazı kutusu bir sonraki bölümde bağlanacak.
+
+Mesaj gönderildiğinde:
+
+📢 Duyuru kanalı → @everyone + @here
+💬 Sohbet kanalı → Etiketsiz`,
+            ephemeral: true
+        });
+
+    }
+
+
+    /* =========================
+        MESAJ TEMİZLE
+    ========================= */
+
+    if (interaction.customId === "admin_clear") {
+
+        return interaction.reply({
+            content:
+`🧹 **Mesaj Temizleme**
+
+Bir sonraki bölümde:
+
+📁 Kanal seçilecek
+🔢 Silinecek mesaj sayısı girilecek
+
+Örnek:
+
+Kanal: #sohbet
+Mesaj: 50`,
+            ephemeral: true
+        });
+
+    }
+
+
+    /* =========================
+        KANAL KİLİTLE
+    ========================= */
+
+    if (interaction.customId === "admin_lock") {
+
+        return interaction.reply({
+            content:
+`🔒 **Kanal Kilitleme**
+
+Bir sonraki bölümde kilitlenecek kanal seçim menüsü açılacak.
+
+Seçilen kanalda normal üyelerin mesaj göndermesi engellenecek.`,
+            ephemeral: true
+        });
+
+    }
+
+
+    /* =========================
+          KANAL AÇ
+    ========================= */
+
+    if (interaction.customId === "admin_unlock") {
+
+        return interaction.reply({
+            content:
+`🔓 **Kanal Açma**
+
+Bir sonraki bölümde kanal seçim menüsü açılacak.
+
+Seçilen kanal tekrar normal üyelerin mesaj gönderebileceği hale getirilecek.`,
+            ephemeral: true
+        });
+
+    }
+
+
+    /* =========================
+            ÇEKİLİŞ
+    ========================= */
+
+    if (interaction.customId === "admin_giveaway") {
+
+        return interaction.reply({
+            content:
+`🎉 **Çekiliş Sistemi**
+
+Bir sonraki bölümde form açılacak.
+
+📁 Kanal
+🎁 Ödül
+⏱️ Süre
+👑 Kazanan sayısı
+
+hepsi panel üzerinden belirlenecek.`,
+            ephemeral: true
+        });
+
+    }
+
+
+    /* =========================
+              DROP
+    ========================= */
+
+    if (interaction.customId === "admin_drop") {
+
+        return interaction.reply({
+            content:
+`🎁 **Drop Sistemi**
+
+Bir sonraki bölümde form açılacak.
+
+📁 Kanal
+🎁 Ödül
+⏱️ Süre
+
+belirlenecek.
+
+İlk basan kişi ödülü kazanacak.`,
+            ephemeral: true
+        });
+
+    }
 
 });
 /* ===========================
