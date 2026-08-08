@@ -988,6 +988,40 @@ Kanal, ödül ve süre belirle.`)
         components: [row1, row2]
     });
 
+client.on(Events.InteractionCreate, async (interaction) => {
+
+    if (!interaction.isButton()) return;
+
+    if (!interaction.customId.startsWith("admin_")) return;
+
+    if (!interaction.member.permissions.has(
+        PermissionsBitField.Flags.Administrator
+    )) {
+        return interaction.reply({
+            content: "❌ Administrator yetkin yok.",
+            ephemeral: true
+        });
+    }
+
+    const messages = {
+        admin_ticket: "🎫 Ticket Panel butonuna bastın.",
+        admin_announce: "📢 Duyuru butonuna bastın.",
+        admin_clear: "🧹 Mesaj Temizle butonuna bastın.",
+        admin_lock: "🔒 Kanal Kilitle butonuna bastın.",
+        admin_unlock: "🔓 Kanal Aç butonuna bastın.",
+        admin_giveaway: "🎉 Çekiliş butonuna bastın.",
+        admin_drop: "🎁 Drop butonuna bastın."
+    };
+
+    const response = messages[interaction.customId];
+
+    if (!response) return;
+
+    await interaction.reply({
+        content: response,
+        ephemeral: true
+    });
+
 });
 /* ===========================
        !TICKETPANEL
