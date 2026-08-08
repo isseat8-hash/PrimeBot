@@ -246,7 +246,7 @@ client.on(Events.MessageCreate, async (message) => {
         )
 
         .setFooter({
-            text: "AEGISNW • Öneri Sistemi"
+            text: "PL • Öneri Sistemi"
         })
 
         .setTimestamp();
@@ -371,7 +371,7 @@ client.on(Events.MessageCreate, async (message) => {
 
     const embed = new EmbedBuilder()
         .setColor("#5865F2")
-        .setTitle("🎫 AEGISNW Destek Merkezi")
+        .setTitle("🎫 PL Destek Merkezi")
         .setDescription(
 `Aşağıdaki butonlardan birini seçerek destek talebi oluşturabilirsiniz.
 
@@ -628,7 +628,7 @@ client.on("messageCreate", async (message) => {
 
         .setColor("#5865F2")
 
-        .setTitle("🎉 AEGISNW Çekilişi")
+        .setTitle("🎉 PL Çekilişi")
 
         .setDescription(
 `🎁 **Ödül**
@@ -783,7 +783,7 @@ client.on("messageCreate", async (message) => {
 
         .setColor("#57F287")
 
-        .setTitle("🎁 AEGISNW DROP")
+        .setTitle("🎁 PL DROP")
 
         .setDescription(
 `İlk butona basan kişi aşağıdaki ödülü kazanacaktır!
@@ -901,7 +901,7 @@ client.on("messageCreate", async (message) => {
 
     .setColor("#5865F2")
 
-    .setTitle("⚙️ AEGISNW Yönetici Paneli")
+    .setTitle("⚙️ PL Yönetici Paneli")
 
     .setDescription(
 `🛠️ Yönetici komutları
@@ -915,7 +915,7 @@ client.on("messageCreate", async (message) => {
     )
 
     .setFooter({
-        text:"AEGISNW Admin Panel"
+        text:"PL Admin Panel"
     })
 
     .setTimestamp();
@@ -1174,7 +1174,7 @@ client.on("messageCreate", async (message) => {
 
         .setColor("#FEE75C")
 
-        .setTitle("📢 AEGISNW Duyuru")
+        .setTitle("📢 PL Duyuru")
 
         .setDescription(text)
 
@@ -1188,7 +1188,7 @@ client.on("messageCreate", async (message) => {
 
         .setFooter({
 
-            text: "AEGISNW Yönetim"
+            text: "PL Yönetim"
 
         })
 
@@ -1945,7 +1945,7 @@ client.on("guildMemberAdd", async member => {
 
     const channel =
     member.guild.channels.cache.find(
-        ch => ch.name === "💬│genel-sohbet"
+        ch => ch.name === "💬・sohbet"
     );
 
 
