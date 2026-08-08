@@ -881,72 +881,111 @@ client.on("interactionCreate", async interaction => {
     drops.delete(interaction.message.id);
 
 });
-/* ===========================
-          !PANEL
-=========================== */
+/* =========================
+       👑 ADMIN PANEL
+========================= */
 
-client.on("messageCreate", async (message) => {
+client.on(Events.MessageCreate, async (message) => {
 
     if (message.author.bot) return;
-
     if (message.content !== "!panel") return;
 
-
+    // Sadece Administrator
     if (!message.member.permissions.has(
         PermissionsBitField.Flags.Administrator
-    )) return;
-
+    )) {
+        return message.reply({
+            content: "❌ Bu paneli kullanmak için Administrator yetkisine sahip olmalısın.",
+            allowedMentions: { repliedUser: false }
+        });
+    }
 
     const embed = new EmbedBuilder()
+        .setColor("#5865F2")
+        .setTitle("👑 PrimeLegacy Yönetici Paneli")
+        .setDescription(
+`Sunucu yönetim işlemlerini aşağıdaki butonlardan gerçekleştirebilirsin.
 
-    .setColor("#5865F2")
+🎫 **Ticket Paneli**
+Ticket panelinin gönderileceği kanalı seç.
 
-    .setTitle("⚙️ PL Yönetici Paneli")
+📢 **Duyuru**
+Duyuru mesajı oluştur ve otomatik olarak gerekli kanallara gönder.
 
-    .setDescription(
-`🛠️ Yönetici komutları
+🧹 **Mesaj Temizle**
+Kanal seçerek belirlediğin miktarda mesaj sil.
 
-🎫 Ticket Panel
-🧹 Mesaj Temizleme
-🔒 Kanal Kilitleme
-🔓 Kanal Açma
-📢 Duyuru Sistemi
-👮 Moderasyon`
-    )
+🔒 **Kanal Kilitle**
+Seçilen kanalı üyelerin mesaj göndermesine kapat.
 
-    .setFooter({
-        text:"PL Admin Panel"
-    })
+🔓 **Kanal Aç**
+Seçilen kanalın kilidini kaldır.
 
-    .setTimestamp();
+🎉 **Çekiliş**
+Kanal, ödül, süre ve kazanan sayısını belirle.
 
+🎁 **Drop**
+Kanal, ödül ve süre belirle.`)
+        .setFooter({
+            text: "PrimeLegacy • Yönetici Paneli"
+        })
+        .setTimestamp();
 
-    const row = new ActionRowBuilder()
+    const row1 = new ActionRowBuilder()
+        .addComponents(
 
-    .addComponents(
+            new ButtonBuilder()
+                .setCustomId("admin_ticket")
+                .setLabel("Ticket Paneli")
+                .setEmoji("🎫")
+                .setStyle(ButtonStyle.Primary),
 
-        new ButtonBuilder()
-        .setCustomId("admin_ticket")
-        .setLabel("Ticket Panel")
-        .setEmoji("🎫")
-        .setStyle(ButtonStyle.Primary),
+            new ButtonBuilder()
+                .setCustomId("admin_announce")
+                .setLabel("Duyuru")
+                .setEmoji("📢")
+                .setStyle(ButtonStyle.Primary),
 
+            new ButtonBuilder()
+                .setCustomId("admin_clear")
+                .setLabel("Mesaj Temizle")
+                .setEmoji("🧹")
+                .setStyle(ButtonStyle.Danger)
 
-        new ButtonBuilder()
-        .setCustomId("admin_info")
-        .setLabel("Bot Bilgi")
-        .setEmoji("🤖")
-        .setStyle(ButtonStyle.Secondary)
+        );
 
-    );
+    const row2 = new ActionRowBuilder()
+        .addComponents(
 
+            new ButtonBuilder()
+                .setCustomId("admin_lock")
+                .setLabel("Kanal Kilitle")
+                .setEmoji("🔒")
+                .setStyle(ButtonStyle.Danger),
 
-    message.channel.send({
+            new ButtonBuilder()
+                .setCustomId("admin_unlock")
+                .setLabel("Kanal Aç")
+                .setEmoji("🔓")
+                .setStyle(ButtonStyle.Success),
 
-        embeds:[embed],
+            new ButtonBuilder()
+                .setCustomId("admin_giveaway")
+                .setLabel("Çekiliş")
+                .setEmoji("🎉")
+                .setStyle(ButtonStyle.Success),
 
-        components:[row]
+            new ButtonBuilder()
+                .setCustomId("admin_drop")
+                .setLabel("Drop")
+                .setEmoji("🎁")
+                .setStyle(ButtonStyle.Secondary)
 
+        );
+
+    await message.channel.send({
+        embeds: [embed],
+        components: [row1, row2]
     });
 
 });
