@@ -8,6 +8,8 @@ const {
     ActionRowBuilder,
     ButtonBuilder,
     ButtonStyle,
+    StringSelectMenuBuilder,
+StringSelectMenuOptionBuilder,
     PermissionsBitField,
     ChannelType,
     Events
