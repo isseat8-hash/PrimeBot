@@ -887,21 +887,16 @@ client.on("interactionCreate", async interaction => {
     drops.delete(interaction.message.id);
 
 });
-/* =========================================
-        👑 PRIMELEGACY ADMIN PANEL
-========================================= */
+/* =========================================================
+              👑 PRIMELEGACY ADMIN PANEL
+========================================================= */
 
-/*
-Discord.js importlarında şunlar da olmalı:
-
-StringSelectMenuBuilder,
-StringSelectMenuOptionBuilder
-*/
+const adminForms = new Map();
 
 
-/* =========================================
-             !PANEL
-========================================= */
+/* =========================================================
+                    !PANEL
+========================================================= */
 
 client.on(Events.MessageCreate, async (message) => {
 
@@ -912,22 +907,14 @@ client.on(Events.MessageCreate, async (message) => {
     if (!message.member.permissions.has(
         PermissionsBitField.Flags.Administrator
     )) {
-
         return message.reply({
-            content: "❌ Bu komutu kullanmak için Administrator yetkisine sahip olmalısın.",
-            allowedMentions: {
-                repliedUser: false
-            }
+            content: "❌ Bu paneli kullanmak için Administrator yetkisine sahip olmalısın."
         });
-
     }
 
     const embed = new EmbedBuilder()
-
         .setColor("#5865F2")
-
         .setTitle("👑 PrimeLegacy Yönetici Paneli")
-
         .setDescription(
 `Sunucu yönetim işlemlerini aşağıdaki butonlardan gerçekleştirebilirsin.
 
@@ -935,32 +922,29 @@ client.on(Events.MessageCreate, async (message) => {
 Ticket panelinin gönderileceği kanalı seç.
 
 📢 **Duyuru**
-Duyuru mesajı oluştur.
+Duyuru mesajını oluştur ve duyuru + sohbet kanalına gönder.
 
 🧹 **Mesaj Temizle**
-Seçilen kanaldan belirlenen miktarda mesaj sil.
+Kanal seç ve silinecek mesaj sayısını belirle.
 
 🔒 **Kanal Kilitle**
-Seçilen kanalı kilitle.
+Bir kanalı üyelerin mesaj göndermesine kapat.
 
 🔓 **Kanal Aç**
-Seçilen kanalın kilidini kaldır.
+Kilitli bir kanalı tekrar aç.
 
 🎉 **Çekiliş**
 Kanal, ödül, süre ve kazanan sayısını belirle.
 
 🎁 **Drop**
 Kanal, ödül ve süre belirle.`)
-
         .setFooter({
             text: "PrimeLegacy • Yönetici Paneli"
         })
-
         .setTimestamp();
 
 
     const row1 = new ActionRowBuilder()
-
         .addComponents(
 
             new ButtonBuilder()
@@ -985,7 +969,6 @@ Kanal, ödül ve süre belirle.`)
 
 
     const row2 = new ActionRowBuilder()
-
         .addComponents(
 
             new ButtonBuilder()
@@ -1016,290 +999,22 @@ Kanal, ödül ve süre belirle.`)
 
 
     await message.channel.send({
-
         embeds: [embed],
-
-        components: [
-            row1,
-            row2
-        ]
-
+        components: [row1, row2]
     });
 
 });
 
 
-/* =========================================
-        👑 ADMIN PANEL INTERACTION
-========================================= */
+/* =========================================================
+                 ADMIN BUTONLARI
+========================================================= */
 
 client.on(Events.InteractionCreate, async (interaction) => {
 
     if (!interaction.isButton()) return;
 
-
-    const adminButtons = [
-        "admin_ticket",
-        "admin_announce",
-        "admin_clear",
-        "admin_lock",
-        "admin_unlock",
-        "admin_giveaway",
-        "admin_drop"
-    ];
-
-
-    if (!adminButtons.includes(interaction.customId))
-        return;
-
-
-    if (!interaction.member.permissions.has(
-        PermissionsBitField.Flags.Administrator
-    )) {
-
-        return interaction.reply({
-            content: "❌ Bu paneli kullanmak için Administrator yetkisine sahip olmalısın.",
-            ephemeral: true
-        });
-
-    }
-
-
-    /* =====================================
-              🎫 TICKET PANELİ
-    ===================================== */
-
-    if (interaction.customId === "admin_ticket") {
-
-        const channels = interaction.guild.channels.cache
-            .filter(channel =>
-                channel.type === ChannelType.GuildText &&
-                channel.viewable
-            )
-            .first(25);
-
-
-        if (!channels.length) {
-
-            return interaction.reply({
-                content: "❌ Kullanılabilir yazı kanalı bulunamadı.",
-                ephemeral: true
-            });
-
-        }
-
-
-        const options = channels.map(channel =>
-
-            new StringSelectMenuOptionBuilder()
-
-                .setLabel(channel.name.slice(0, 100))
-
-                .setDescription(
-                    `Ticket paneli #${channel.name}`.slice(0, 100)
-                )
-
-                .setValue(channel.id)
-
-        );
-
-
-        const select = new StringSelectMenuBuilder()
-
-            .setCustomId("admin_ticket_channel")
-
-            .setPlaceholder("🎫 Ticket panelinin gönderileceği kanalı seç")
-
-            .addOptions(options);
-
-
-        const row = new ActionRowBuilder()
-            .addComponents(select);
-
-
-        return interaction.reply({
-
-            content:
-`🎫 **Ticket Paneli**
-
-Aşağıdaki menüden ticket panelinin gönderileceği kanalı seç.
-
-Seçtiğin kanala 4 butonlu ticket paneli gönderilecek.`,
-
-            components: [row],
-
-            ephemeral: true
-
-        });
-
-    }
-
-
-    /* =====================================
-                📢 DUYURU
-    ===================================== */
-
-    if (interaction.customId === "admin_announce") {
-
-        return interaction.reply({
-
-            content:
-`📢 **Duyuru Sistemi**
-
-Duyuru sistemi sonraki aşamada modal ile yapılacak.
-
-Mesaj yazabileceğin bir kutu açılacak ve:
-
-📢 Duyuru kanalına → @everyone + @here
-💬 Sohbet kanalına → etiketsiz
-
-gönderilecek.`,
-
-            ephemeral: true
-
-        });
-
-    }
-
-
-    /* =====================================
-              🧹 MESAJ TEMİZLE
-    ===================================== */
-
-    if (interaction.customId === "admin_clear") {
-
-        return interaction.reply({
-
-            content:
-`🧹 **Mesaj Temizle**
-
-Sonraki aşamada:
-
-📁 Kanal seçilecek
-🔢 Kaç mesaj silineceği girilecek
-
-Örnek:
-
-#sohbet
-50 mesaj`,
-
-            ephemeral: true
-
-        });
-
-    }
-
-
-    /* =====================================
-              🔒 KANAL KİLİTLE
-    ===================================== */
-
-    if (interaction.customId === "admin_lock") {
-
-        return interaction.reply({
-
-            content:
-`🔒 **Kanal Kilitle**
-
-Sonraki aşamada kanal seçim menüsü açılacak.
-
-Seçilen kanalda üyelerin mesaj göndermesi engellenecek.`,
-
-            ephemeral: true
-
-        });
-
-    }
-
-
-    /* =====================================
-                🔓 KANAL AÇ
-    ===================================== */
-
-    if (interaction.customId === "admin_unlock") {
-
-        return interaction.reply({
-
-            content:
-`🔓 **Kanal Aç**
-
-Sonraki aşamada kanal seçim menüsü açılacak.
-
-Seçilen kanal tekrar yazılabilir hale getirilecek.`,
-
-            ephemeral: true
-
-        });
-
-    }
-
-
-    /* =====================================
-                🎉 ÇEKİLİŞ
-    ===================================== */
-
-    if (interaction.customId === "admin_giveaway") {
-
-        return interaction.reply({
-
-            content:
-`🎉 **Çekiliş**
-
-Sonraki aşamada form açılacak.
-
-📁 Kanal
-🎁 Ödül
-⏱️ Süre
-👑 Kazanan sayısı
-
-panel üzerinden belirlenecek.`,
-
-            ephemeral: true
-
-        });
-
-    }
-
-
-    /* =====================================
-                  🎁 DROP
-    ===================================== */
-
-    if (interaction.customId === "admin_drop") {
-
-        return interaction.reply({
-
-            content:
-`🎁 **Drop**
-
-Sonraki aşamada form açılacak.
-
-📁 Kanal
-🎁 Ödül
-⏱️ Süre
-
-belirlenecek.
-
-İlk basan kişi ödülü kazanacak.`,
-
-            ephemeral: true
-
-        });
-
-    }
-
-});
-
-
-/* =========================================
-       🎫 TICKET KANAL SEÇİMİ
-========================================= */
-
-client.on(Events.InteractionCreate, async (interaction) => {
-
-    if (!interaction.isStringSelectMenu()) return;
-
-    if (interaction.customId !== "admin_ticket_channel")
+    if (!interaction.customId.startsWith("admin_"))
         return;
 
 
@@ -1315,29 +1030,251 @@ client.on(Events.InteractionCreate, async (interaction) => {
     }
 
 
-    const channelId = interaction.values[0];
+    /* =====================================================
+                       🎫 TICKET
+    ===================================================== */
 
-    const channel =
-        interaction.guild.channels.cache.get(channelId);
+    if (interaction.customId === "admin_ticket") {
+
+        await interaction.deferReply({
+            ephemeral: true
+        });
 
 
-    if (!channel) {
+        const channels = interaction.guild.channels.cache
+            .filter(channel =>
+                channel.type === ChannelType.GuildText &&
+                channel.viewable
+            )
+            .first(25);
+
+
+        if (!channels.length) {
+            return interaction.editReply(
+                "❌ Kullanılabilir yazı kanalı bulunamadı."
+            );
+        }
+
+
+        const options = channels.map(channel =>
+
+            new StringSelectMenuOptionBuilder()
+                .setLabel(channel.name.slice(0, 100))
+                .setDescription(
+                    `Ticket paneli #${channel.name}`.slice(0, 100)
+                )
+                .setValue(channel.id)
+
+        );
+
+
+        const select = new StringSelectMenuBuilder()
+            .setCustomId("admin_ticket_channel")
+            .setPlaceholder("🎫 Ticket panelinin gönderileceği kanalı seç")
+            .addOptions(options);
+
+
+        return interaction.editReply({
+            content: "🎫 Ticket panelinin gönderileceği kanalı seç:",
+            components: [
+                new ActionRowBuilder().addComponents(select)
+            ]
+        });
+
+    }
+
+
+    /* =====================================================
+                       📢 DUYURU
+    ===================================================== */
+
+    if (interaction.customId === "admin_announce") {
+
+        const modal = new ModalBuilder()
+            .setCustomId("announce_modal")
+            .setTitle("📢 PrimeLegacy Duyuru");
+
+
+        const input = new TextInputBuilder()
+            .setCustomId("announce_text")
+            .setLabel("Duyuru mesajı")
+            .setPlaceholder("Duyuru mesajını buraya yaz...")
+            .setStyle(TextInputStyle.Paragraph)
+            .setRequired(true)
+            .setMaxLength(4000);
+
+
+        modal.addComponents(
+            new ActionRowBuilder().addComponents(input)
+        );
+
+
+        return interaction.showModal(modal);
+
+    }
+
+
+    /* =====================================================
+                    🧹 MESAJ TEMİZLE
+    ===================================================== */
+
+    if (interaction.customId === "admin_clear") {
+
+        const select = new ChannelSelectMenuBuilder()
+            .setCustomId("admin_clear_channel")
+            .setPlaceholder("🧹 Mesajların silineceği kanalı seç")
+            .setChannelTypes(ChannelType.GuildText);
+
 
         return interaction.reply({
-            content: "❌ Kanal bulunamadı.",
+            content: "🧹 Mesajların silineceği kanalı seç:",
+            components: [
+                new ActionRowBuilder().addComponents(select)
+            ],
             ephemeral: true
         });
 
     }
 
 
-    const embed = new EmbedBuilder()
+    /* =====================================================
+                    🔒 KANAL KİLİTLE
+    ===================================================== */
 
-        .setColor("#5865F2")
+    if (interaction.customId === "admin_lock") {
 
-        .setTitle("🎫 PrimeLegacy Destek Merkezi")
+        const select = new ChannelSelectMenuBuilder()
+            .setCustomId("admin_lock_channel")
+            .setPlaceholder("🔒 Kilitlenecek kanalı seç")
+            .setChannelTypes(ChannelType.GuildText);
 
-        .setDescription(
+
+        return interaction.reply({
+            content: "🔒 Kilitlenecek kanalı seç:",
+            components: [
+                new ActionRowBuilder().addComponents(select)
+            ],
+            ephemeral: true
+        });
+
+    }
+
+
+    /* =====================================================
+                     🔓 KANAL AÇ
+    ===================================================== */
+
+    if (interaction.customId === "admin_unlock") {
+
+        const select = new ChannelSelectMenuBuilder()
+            .setCustomId("admin_unlock_channel")
+            .setPlaceholder("🔓 Açılacak kanalı seç")
+            .setChannelTypes(ChannelType.GuildText);
+
+
+        return interaction.reply({
+            content: "🔓 Açılacak kanalı seç:",
+            components: [
+                new ActionRowBuilder().addComponents(select)
+            ],
+            ephemeral: true
+        });
+
+    }
+
+
+    /* =====================================================
+                       🎉 ÇEKİLİŞ
+    ===================================================== */
+
+    if (interaction.customId === "admin_giveaway") {
+
+        const select = new ChannelSelectMenuBuilder()
+            .setCustomId("admin_giveaway_channel")
+            .setPlaceholder("🎉 Çekilişin yapılacağı kanalı seç")
+            .setChannelTypes(ChannelType.GuildText);
+
+
+        return interaction.reply({
+            content: "🎉 Çekilişin yapılacağı kanalı seç:",
+            components: [
+                new ActionRowBuilder().addComponents(select)
+            ],
+            ephemeral: true
+        });
+
+    }
+
+
+    /* =====================================================
+                        🎁 DROP
+    ===================================================== */
+
+    if (interaction.customId === "admin_drop") {
+
+        const select = new ChannelSelectMenuBuilder()
+            .setCustomId("admin_drop_channel")
+            .setPlaceholder("🎁 Drop yapılacak kanalı seç")
+            .setChannelTypes(ChannelType.GuildText);
+
+
+        return interaction.reply({
+            content: "🎁 Drop yapılacak kanalı seç:",
+            components: [
+                new ActionRowBuilder().addComponents(select)
+            ],
+            ephemeral: true
+        });
+
+    }
+
+});
+
+
+/* =========================================================
+                 SELECT MENÜLER
+========================================================= */
+
+client.on(Events.InteractionCreate, async (interaction) => {
+
+    if (!interaction.isAnySelectMenu()) return;
+
+
+    if (!interaction.member.permissions.has(
+        PermissionsBitField.Flags.Administrator
+    )) {
+
+        return interaction.reply({
+            content: "❌ Administrator yetkin yok.",
+            ephemeral: true
+        });
+
+    }
+
+
+    /* =====================================================
+                    🎫 TICKET KANALI
+    ===================================================== */
+
+    if (interaction.customId === "admin_ticket_channel") {
+
+        const channel = interaction.guild.channels.cache.get(
+            interaction.values[0]
+        );
+
+
+        if (!channel) {
+            return interaction.update({
+                content: "❌ Kanal bulunamadı.",
+                components: []
+            });
+        }
+
+
+        const embed = new EmbedBuilder()
+            .setColor("#5865F2")
+            .setTitle("🎫 PrimeLegacy Destek Merkezi")
+            .setDescription(
 `Destek almak için aşağıdaki kategorilerden uygun olanı seç.
 
 🐞 **Bug Bildirme**
@@ -1351,68 +1288,381 @@ Genel yardım ve sorular.
 
 🎁 **Ödül Talep**
 Kazandığın ödülü talep et.`)
-
-        .setFooter({
-            text: "PrimeLegacy • Ticket Sistemi"
-        })
-
-        .setTimestamp();
+            .setFooter({
+                text: "PrimeLegacy • Ticket Sistemi"
+            })
+            .setTimestamp();
 
 
-    const row = new ActionRowBuilder()
+        const row = new ActionRowBuilder()
+            .addComponents(
 
-        .addComponents(
+                new ButtonBuilder()
+                    .setCustomId("ticket_bug")
+                    .setLabel("Bug Bildirme")
+                    .setEmoji("🐞")
+                    .setStyle(ButtonStyle.Primary),
 
-            new ButtonBuilder()
-                .setCustomId("ticket_bug")
-                .setLabel("Bug Bildirme")
-                .setEmoji("🐞")
-                .setStyle(ButtonStyle.Primary),
+                new ButtonBuilder()
+                    .setCustomId("ticket_report")
+                    .setLabel("Küfür / Hile")
+                    .setEmoji("🚨")
+                    .setStyle(ButtonStyle.Danger),
 
-            new ButtonBuilder()
-                .setCustomId("ticket_report")
-                .setLabel("Küfür / Hile")
-                .setEmoji("🚨")
-                .setStyle(ButtonStyle.Danger),
+                new ButtonBuilder()
+                    .setCustomId("ticket_support")
+                    .setLabel("Genel Destek")
+                    .setEmoji("💬")
+                    .setStyle(ButtonStyle.Success),
 
-            new ButtonBuilder()
-                .setCustomId("ticket_support")
-                .setLabel("Genel Destek")
-                .setEmoji("💬")
-                .setStyle(ButtonStyle.Success),
+                new ButtonBuilder()
+                    .setCustomId("ticket_reward")
+                    .setLabel("Ödül Talep")
+                    .setEmoji("🎁")
+                    .setStyle(ButtonStyle.Secondary)
 
-            new ButtonBuilder()
-                .setCustomId("ticket_reward")
-                .setLabel("Ödül Talep")
-                .setEmoji("🎁")
-                .setStyle(ButtonStyle.Secondary)
+            );
 
+
+        await channel.send({
+            embeds: [embed],
+            components: [row]
+        });
+
+
+        return interaction.update({
+            content:
+`✅ Ticket paneli gönderildi!
+
+📁 Kanal: ${channel}`,
+            components: []
+        });
+
+    }
+
+
+    /* =====================================================
+                     🧹 TEMİZLE KANALI
+    ===================================================== */
+
+    if (interaction.customId === "admin_clear_channel") {
+
+        adminForms.set(interaction.user.id, {
+            channelId: interaction.values[0]
+        });
+
+
+        const modal = new ModalBuilder()
+            .setCustomId("clear_modal")
+            .setTitle("🧹 Mesaj Temizle");
+
+
+        const input = new TextInputBuilder()
+            .setCustomId("clear_amount")
+            .setLabel("Kaç mesaj silinsin?")
+            .setPlaceholder("Örnek: 50")
+            .setStyle(TextInputStyle.Short)
+            .setRequired(true)
+            .setMinLength(1)
+            .setMaxLength(3);
+
+
+        modal.addComponents(
+            new ActionRowBuilder().addComponents(input)
         );
 
 
-    await channel.send({
+        return interaction.showModal(modal);
 
-        embeds: [embed],
-
-        components: [row]
-
-    });
+    }
 
 
-    return interaction.update({
+    /* =====================================================
+                      🔒 KİLİTLE
+    ===================================================== */
 
-        content:
-`✅ **Ticket paneli gönderildi!**
+    if (interaction.customId === "admin_lock_channel") {
 
-📁 Kanal: ${channel}
+        const channel = interaction.guild.channels.cache.get(
+            interaction.values[0]
+        );
 
-👥 Ticket butonlarını herkes kullanabilir.`,
 
-        components: []
+        if (!channel) {
+            return interaction.reply({
+                content: "❌ Kanal bulunamadı.",
+                ephemeral: true
+            });
+        }
 
-    });
+
+        await channel.permissionOverwrites.edit(
+            interaction.guild.roles.everyone,
+            {
+                SendMessages: false
+            }
+        );
+
+
+        return interaction.update({
+            content: `🔒 ${channel} başarıyla kilitlendi.`,
+            components: []
+        });
+
+    }
+
+
+    /* =====================================================
+                       🔓 AÇ
+    ===================================================== */
+
+    if (interaction.customId === "admin_unlock_channel") {
+
+        const channel = interaction.guild.channels.cache.get(
+            interaction.values[0]
+        );
+
+
+        if (!channel) {
+            return interaction.reply({
+                content: "❌ Kanal bulunamadı.",
+                ephemeral: true
+            });
+        }
+
+
+        await channel.permissionOverwrites.edit(
+            interaction.guild.roles.everyone,
+            {
+                SendMessages: null
+            }
+        );
+
+
+        return interaction.update({
+            content: `🔓 ${channel} tekrar açıldı.`,
+            components: []
+        });
+
+    }
+
+
+    /* =====================================================
+                    🎉 ÇEKİLİŞ KANALI
+    ===================================================== */
+
+    if (interaction.customId === "admin_giveaway_channel") {
+
+        adminForms.set(interaction.user.id, {
+            channelId: interaction.values[0]
+        });
+
+
+        const modal = new ModalBuilder()
+            .setCustomId("giveaway_modal")
+            .setTitle("🎉 Çekiliş Oluştur");
+
+
+        const prize = new TextInputBuilder()
+            .setCustomId("giveaway_prize")
+            .setLabel("Ödül")
+            .setPlaceholder("Örnek: Minecraft Premium")
+            .setStyle(TextInputStyle.Short)
+            .setRequired(true)
+            .setMaxLength(100);
+
+
+        const duration = new TextInputBuilder()
+            .setCustomId("giveaway_duration")
+            .setLabel("Süre")
+            .setPlaceholder("Örnek: 1d / 12h / 30m")
+            .setStyle(TextInputStyle.Short)
+            .setRequired(true)
+            .setMaxLength(20);
+
+
+        const winners = new TextInputBuilder()
+            .setCustomId("giveaway_winners")
+            .setLabel("Kazanan sayısı")
+            .setPlaceholder("Örnek: 2")
+            .setStyle(TextInputStyle.Short)
+            .setRequired(true)
+            .setMaxLength(3);
+
+
+        modal.addComponents(
+            new ActionRowBuilder().addComponents(prize),
+            new ActionRowBuilder().addComponents(duration),
+            new ActionRowBuilder().addComponents(winners)
+        );
+
+
+        return interaction.showModal(modal);
+
+    }
+
+
+    /* =====================================================
+                      🎁 DROP KANALI
+    ===================================================== */
+
+    if (interaction.customId === "admin_drop_channel") {
+
+        adminForms.set(interaction.user.id, {
+            channelId: interaction.values[0]
+        });
+
+
+        const modal = new ModalBuilder()
+            .setCustomId("drop_modal")
+            .setTitle("🎁 Drop Oluştur");
+
+
+        const prize = new TextInputBuilder()
+            .setCustomId("drop_prize")
+            .setLabel("Ödül")
+            .setPlaceholder("Örnek: 1000 Coin")
+            .setStyle(TextInputStyle.Short)
+            .setRequired(true)
+            .setMaxLength(100);
+
+
+        const duration = new TextInputBuilder()
+            .setCustomId("drop_duration")
+            .setLabel("Süre")
+            .setPlaceholder("Örnek: 10m / 1h / 1d")
+            .setStyle(TextInputStyle.Short)
+            .setRequired(true)
+            .setMaxLength(20);
+
+
+        modal.addComponents(
+            new ActionRowBuilder().addComponents(prize),
+            new ActionRowBuilder().addComponents(duration)
+        );
+
+
+        return interaction.showModal(modal);
+
+    }
 
 });
+
+
+/* =========================================================
+                       MODALLAR
+========================================================= */
+
+client.on(Events.InteractionCreate, async (interaction) => {
+
+    if (!interaction.isModalSubmit()) return;
+
+
+    if (!interaction.member.permissions.has(
+        PermissionsBitField.Flags.Administrator
+    )) {
+
+        return interaction.reply({
+            content: "❌ Administrator yetkin yok.",
+            ephemeral: true
+        });
+
+    }
+
+
+    /* =====================================================
+                         📢 DUYURU
+    ===================================================== */
+
+    if (interaction.customId === "announce_modal") {
+
+        const text =
+            interaction.fields.getTextInputValue("announce_text");
+
+
+        const announceChannel =
+            interaction.guild.channels.cache.get(
+                ANNOUNCE_CHANNEL
+            );
+
+
+        const chatChannel =
+            interaction.guild.channels.cache.get(
+                CHAT_CHANNEL
+            );
+
+
+        if (!announceChannel || !chatChannel) {
+
+            return interaction.reply({
+                content:
+"❌ Duyuru veya sohbet kanalı bulunamadı. Kanal ID'lerini kontrol et.",
+                ephemeral: true
+            });
+
+        }
+
+
+        const embed = new EmbedBuilder()
+            .setColor("#5865F2")
+            .setTitle("📢 PrimeLegacy Duyuru")
+            .setDescription(text)
+            .setFooter({
+                text: `Duyuru • ${interaction.user.username}`
+            })
+            .setTimestamp();
+
+
+        await announceChannel.send({
+            content: "@everyone @here",
+            embeds: [embed],
+            allowedMentions: {
+                parse: ["everyone"]
+            }
+        });
+
+
+        await chatChannel.send({
+            embeds: [embed]
+        });
+
+
+        return interaction.reply({
+            content:
+`✅ Duyuru gönderildi!
+
+📢 Duyuru: ${announceChannel}
+💬 Sohbet: ${chatChannel}`,
+            ephemeral: true
+        });
+
+    }
+
+
+    /* =====================================================
+                       🧹 TEMİZLE
+    ===================================================== */
+
+    if (interaction.customId === "clear_modal") {
+
+        const data = adminForms.get(
+            interaction.user.id
+        );
+
+
+        if (!data) {
+
+            return interaction.reply({
+                content: "❌ İşlem süresi dolmuş. Panelden tekrar başla.",
+                ephemeral: true
+            });
+
+        }
+
+
+        const amount = Number(
+            interaction.fields.getTextInputValue(
+     
 /* ===========================
        !TICKETPANEL
 =========================== */
