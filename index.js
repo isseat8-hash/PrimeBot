@@ -387,7 +387,7 @@ client.on(Events.MessageCreate, async (message) => {
 🎁 Ödül Talep`
         )
         .setThumbnail(client.user.displayAvatarURL())
-        .setFooter({ text: "AEGISNW Ticket Sistemi" })
+        .setFooter({ text: "PL Ticket Sistemi" })
         .setTimestamp();
 
     const row = new ActionRowBuilder().addComponents(
