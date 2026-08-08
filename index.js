@@ -364,127 +364,60 @@ client.on(Events.InteractionCreate, async interaction => {
 client.on(Events.MessageCreate, async (message) => {
 
     if (message.author.bot) return;
-
     if (message.content !== "!ticket") return;
 
     if (!message.member.permissions.has(PermissionsBitField.Flags.Administrator))
         return;
 
     const embed = new EmbedBuilder()
-
         .setColor("#5865F2")
-
-        .setTitle("🎫 AEGISNW Destek Sistemi")
-
+        .setTitle("🎫 AEGISNW Destek Merkezi")
         .setDescription(
-`Aşağıdaki butonlardan uygun olanı seçerek destek talebi oluşturabilirsiniz.
+`Aşağıdaki butonlardan birini seçerek destek talebi oluşturabilirsiniz.
 
 🐞 Bug Bildirme
 🚨 Küfür / Hile Bildirme
 💬 Genel Destek
 🎁 Ödül Talep`
-)
-
-        .setFooter({
-            text: "AEGISNW Ticket Sistemi"
-        })
-
+        )
+        .setThumbnail(client.user.displayAvatarURL())
+        .setFooter({ text: "AEGISNW Ticket Sistemi" })
         .setTimestamp();
 
-    const row = new ActionRowBuilder()
+    const row = new ActionRowBuilder().addComponents(
 
-        .addComponents(
+        new ButtonBuilder()
+        .setCustomId("ticket_bug")
+        .setLabel("Bug Bildir")
+        .setEmoji("🐞")
+        .setStyle(ButtonStyle.Primary),
 
-            new ButtonBuilder()
-            .setCustomId("ticket_bug")
-            .setLabel("Bug")
-            .setEmoji("🐞")
-            .setStyle(ButtonStyle.Primary),
+        new ButtonBuilder()
+        .setCustomId("ticket_report")
+        .setLabel("Küfür/Hile")
+        .setEmoji("🚨")
+        .setStyle(ButtonStyle.Danger),
 
-            new ButtonBuilder()
-            .setCustomId("ticket_report")
-            .setLabel("Küfür/Hile")
-            .setEmoji("🚨")
-            .setStyle(ButtonStyle.Danger),
+        new ButtonBuilder()
+        .setCustomId("ticket_support")
+        .setLabel("Genel Destek")
+        .setEmoji("💬")
+        .setStyle(ButtonStyle.Success),
 
-            new ButtonBuilder()
-            .setCustomId("ticket_support")
-            .setLabel("Destek")
-            .setEmoji("💬")
-            .setStyle(ButtonStyle.Success),
+        new ButtonBuilder()
+        .setCustomId("ticket_reward")
+        .setLabel("Ödül Talep")
+        .setEmoji("🎁")
+        .setStyle(ButtonStyle.Secondary)
 
-            new ButtonBuilder()
-            .setCustomId("ticket_reward")
-            .setLabel("Ödül")
-            .setEmoji("🎁")
-            .setStyle(ButtonStyle.Secondary)
-
-        );
+    );
 
     message.channel.send({
-
         embeds: [embed],
-
         components: [row]
-
     });
 
 });
-/* =========================
-      TICKET OLUŞTURMA
-========================= */
-
-client.on(Events.InteractionCreate, async interaction => {
-
-    if (!interaction.isButton()) return;
-
-    if (!interaction.customId.startsWith("ticket_")) return;
-
-    if (tickets.has(interaction.user.id)) {
-
-        return interaction.reply({
-
-            content: "❌ Zaten açık bir ticketın var.",
-
-            ephemeral: true
-
-        });
-
-    }
-
-    let kategori = "destek";
-
-    switch (interaction.customId) {
-
-        case "ticket_bug":
-            kategori = "bug";
-        break;
-
-        case "ticket_report":
-            kategori = "hile";
-        break;
-
-        case "ticket_support":
-            kategori = "destek";
-        break;
-
-        case "ticket_reward":
-            kategori = "ödül";
-        break;
-
-    }
-
-    const channel = await interaction.guild.channels.create({
-
-        name: `ticket-${interaction.user.username}`,
-
-        type: ChannelType.GuildText,
-
-        permissionOverwrites: [
-
-            {
-
-
 /* ===========================
       TICKET OLUŞTURMA
 =========================== */
@@ -1402,6 +1335,7 @@ client.on("messageCreate", async message => {
     }
 
 });
+
 /* ===========================
              !WARN
 =========================== */
@@ -1945,7 +1879,7 @@ client.on("messageCreate", async message => {
 
     .setColor("#00FF88")
 
-    .setTitle("🌐 AEGISNW Minecraft Sunucusu")
+    .setTitle("🌐 PL Minecraft Sunucusu")
 
     .setDescription(
 `━━━━━━━━━━━━━━━━
@@ -1968,10 +1902,10 @@ client.on("messageCreate", async message => {
 ━━━━━━━━━━━━━━━━
 
 ⭐ Sunucu:
-**AEGISNW**
+**PL**
 
 🎮 Oyun Modu:
-**Skyblock**
+**Yakında**
 
 ━━━━━━━━━━━━━━━━`
     )
@@ -2214,94 +2148,13 @@ Spam yaptığın için **1 dakika susturuldun**.`
 
 const badWords = [
 
-    // Genel küfürl
-    "amk"
-    "aq"
-    "a.q"
-    "a.q."
-    "amq"
-    "amına"
-    "amina"
-    "anan"
-    "siktir"
-    "sikerim"
-    "sik"
-    "siki"
-    "sikik"
-    "sikiyim"
-    "sikeyim"
-    "siktim"
-    "siktin"
-
-    // Hakaretl
-    "salak"
-    "aptal"
-    "gerizekalı"
-    "gerizekali"
-    "mal"
-    "öküz"
-    "inek"
-    "dangalak"
-    "ahmak"
-    "beyinsiz"
-    "ezik"
-    "şerefsiz"
-    "serefsiz"
-    "haysiyetsiz"
-    "karaktersiz"
-
-    // Ağır hakaretl
-    "orospu"
-    "orospunun"
-    "orospuçocuğu"
-    "orospucocugu"
-    "piç"
-    "pic"
-    "piçkurusu"
-    "pickurusu"
-    "yavşak"
-    "yavsak"
-    "kahpe"
-    "it"
-    "köpek"
-
-    // Cinsel içerikli ar
+    "amk",
+    "aq",
+    "orospu",
+    "siktir",
     "yarrak"
-    "yarak"
-    "yarra"
-    "dildo"
-    "penis"
-    "amcık"
-    "amcik"
-    "meme"
-    "göt"
-    "got"
-    "götveren"
-    "gotveren"
 
-    // İngilizce yaygın küfürl
-    "fuck"
-    "fuk"
-    "fucker"
-    "fucking"
-    "shit"
-    "bitch"
-    "asshole"
-    "dick"
-    "pussy"
-    "cunt"
-
-    // Spam amaçlı yazıml
-    "a m k"
-    "a.m.k"
-    "a-m-k"
-    "s i k"
-    "s.i.k"
-    "s-i-k"
-    "o r o s p u"
-    "orospu çocuğu
-
-];"
+];
 
 
 
