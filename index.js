@@ -70,7 +70,7 @@ client.once(Events.ClientReady, async () => {
     client.user.setPresence({
         activities: [
             {
-                name: "AEGISNW ❤️"
+                name: "LynoxNW ❤️"
             }
         ],
         status: "online"
