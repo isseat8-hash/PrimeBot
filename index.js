@@ -43,16 +43,16 @@ const PREFIX = "!";
          AYARLAR
 ========================= */
 
-const SUGGESTION_CHANNEL = "1506325269504458917";
-const AUTOROLE_ID = "1515708868120936518";
+const SUGGESTION_CHANNEL = "1513332634120491109";
+const AUTOROLE_ID = "1506277784878846043";
 
-const ANNOUNCE_CHANNEL = "1506325268900483183";
-const CHAT_CHANNEL = "1506325269504458914";
+const ANNOUNCE_CHANNEL = "1506277899064442910";
+const CHAT_CHANNEL = "1513330999763927050";
 
-const OWNER_ID = "1003708560728920165";
+const OWNER_ID = "1486765995787030659";
 const LOG_CHANNEL = 
-"1506325269948928051";
-const TICKET_LOG_CHANNEL = "1515709726355226686";
+"1514827011359510620";
+const TICKET_LOG_CHANNEL = "1514827011359510620";
 
 /* =========================
       HAFIZA VERİLERİ
@@ -377,7 +377,7 @@ client.on(Events.MessageCreate, async (message) => {
 
     const embed = new EmbedBuilder()
         .setColor("#5865F2")
-        .setTitle("🎫 PL Destek Merkezi")
+        .setTitle("🎫 LynoxNw Destek Merkezi")
         .setDescription(
 `Aşağıdaki butonlardan birini seçerek destek talebi oluşturabilirsiniz.
 
@@ -634,7 +634,7 @@ client.on("messageCreate", async (message) => {
 
         .setColor("#5865F2")
 
-        .setTitle("🎉 PL Çekilişi")
+        .setTitle("🎉 LynoxNetwork Çekiliş Sistemi")
 
         .setDescription(
 `🎁 **Ödül**
@@ -789,7 +789,7 @@ client.on("messageCreate", async (message) => {
 
         .setColor("#57F287")
 
-        .setTitle("🎁 PL DROP")
+        .setTitle("🎁 Lynox Nw DROP")
 
         .setDescription(
 `İlk butona basan kişi aşağıdaki ödülü kazanacaktır!
@@ -1111,7 +1111,7 @@ client.on("messageCreate", async (message) => {
 
         .setColor("#FEE75C")
 
-        .setTitle("📢 PL Duyuru")
+        .setTitle("📢 Lynox Nw Duyuru")
 
         .setDescription(text)
 
@@ -1816,7 +1816,7 @@ client.on("messageCreate", async message => {
 
     .setColor("#00FF88")
 
-    .setTitle("🌐 PL Minecraft Sunucusu")
+    .setTitle("🌐 Lynox Nw Minecraft Sunucusu")
 
     .setDescription(
 `━━━━━━━━━━━━━━━━
@@ -1824,25 +1824,18 @@ client.on("messageCreate", async message => {
 ☕ **Java Edition**
 
 🔗 IP:
-**Yakında**
+**Play.lynoxnetwork.com**
 
 ━━━━━━━━━━━━━━━━
-
-📱 **Bedrock Edition**
-
-🔗 IP:
-**Yakında**
-
-🔌 Port:
-**Yakında**
+Lynox Network❤️❤️
 
 ━━━━━━━━━━━━━━━━
 
 ⭐ Sunucu:
-**PL**
+**LynoxNetwork**
 
 🎮 Oyun Modu:
-**Yakında**
+**Boxpvp**
 
 ━━━━━━━━━━━━━━━━`
     )
